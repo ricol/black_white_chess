@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Menus, ComCtrls, ExtCtrls, StdCtrls, ToolWin, UnitCommon, UnitTBoardGame, UnitTStateTree;
+  Dialogs, Menus, ComCtrls, ExtCtrls, StdCtrls, ToolWin, UnitCommon, UnitTBoardGame, UnitTStateNode, UnitTStateTree;
 
 type
 
@@ -75,12 +75,15 @@ type
     procedure SaveGame(); override;
     procedure LoadGame(); override;
     procedure Swap(); override;
+    function GoToLevel(var x, y: Integer; piece: TPiece): boolean;
+    function AnalyzeToLevel(level: Integer; var x, y: Integer; piece: TPiece): boolean;
+    procedure NextLevel(const totalLevel: Integer; piece: TPiece; const step: TPoint; gameOld: TBlackWhiteGame; var stateTree: TStateTree; var currentNode: TStateNode);
   end;
 
 implementation
 
 uses
-  UnitTStateNode, UnitTBlackWhiteGameStateTree;
+  UnitTBlackWhiteGameStateTree;
 
 var
   GStateTree: TStateTree;
@@ -174,84 +177,12 @@ begin
   Result := tmpPoint;
 end;
 
-{
-procedure TBlackWhiteGame.AnalyzeUntilToTheLevel(level: Integer;
-  stateTree: TStateTree; turn: TTurn);
-
+function TBlackWhiteGame.AnalyzeToLevel(level: Integer; var x, y: Integer; piece: TPiece): boolean;
 var
-  k1, k2: Integer;
-  tmpNumber1, tmpNumber2: Integer;
-  tmpData1, tmpData2: TListOfPoints;
-  tmpGame1, tmpGame2: TBlackWhiteGame;
-
-  tmpCurrentNode: TStateNode;
-  tmpPoint: TPoint;
-  tmpHead: TBoardGame;
-  i: Integer;
-  piece: TPiece;
-  tmpX, tmpY: Integer;
-begin
-
-  if turn = WHITE then
-    piece := PIECE_WHITE
-  else
-    piece := PIECE_BLACK;
-
-  for i := 0 to level - 1 do
-  begin
-    tmpNumber1 := Self.GetAllAvailableMove(tmpData1, piece);
-    if tmpNumber1 > 0 then
-    begin
-      for k1 := 0 to tmpNumber1 - 1 do
-      begin
-        tmpGame1 := TBlackWhiteGame.Create(Self);
-        tmpGame1.IsTempGame := True;
-        tmpPoint := tmpData1[k1];
-        tmpGame1.PlayAtMove(tmpPoint.x, tmpPoint.y, piece);
-        tmpCurrentNode := GStateTree.InsertTheNode(tmpGame1, tmpPoint.x, tmpPoint.y, tmpCurrentNode);
-        //get all possible moves for the opponent of piece.
-
-        tmpNumber2 := tmpGame1.GetAllAvailableMove(tmpData2, TBlackWhiteGame.GetOpponent(piece));
-        if tmpNumber2 > 0 then
-        begin
-          for k2 := 0 to tmpNumber2 - 1 do
-          begin
-            tmpGame2 := TBlackWhiteGame.Create(tmpGame1);
-            tmpGame2.IsTempGame := True;
-            tmpPoint := tmpData2[k2];
-            tmpGame2.PlayAtMove(tmpPoint.x, tmpPoint.y, TBlackWhiteGame.GetOpponent(piece
-            ));
-            tmpPoint := tmpData1[k1];
-            tmpCurrentNode := GStateTree.InsertTheNode(tmpGame2, tmpPoint.x, tmpPoint.y, tmpCurrentNode);
-            tmpCurrentNode := tmpCurrentNode.parentNode;
-          end;
-        end else begin
-          FreeAndNil(tmpData2);
-          Continue;
-        end;
-        FreeAndNil(tmpData2);
-      end;
-    end else begin
-      tmpPoint := tmpData1[k1];
-      tmpX := tmpPoint.x;
-      tmpY := tmpPoint.y;
-      FreeAndNil(tmpData1);
-      FreeAndNil(GStateTree);
-      FProgressBar.Visible := False;
-      Exit;
-    end;
-  end;
-end;
-}
-
-//return a optimal position (i and j) for the current player which holds "piece"
-//if there is no available move, then return "false", else return "true"
-function TBlackWhiteGame.AutoPlay(var i: Integer; var j: Integer; piece: TPiece): Boolean;
-var
-  k1, k2, k3, k4, k5, k6, k7: Integer;
-  tmpNumber1, tmpNumber2, tmpNumber3, tmpNumber4, tmpNumber5, tmpNumber6, tmpNumber7: Integer;
-  tmpData1, tmpData2, tmpData3, tmpData4, tmpData5, tmpData6, tmpData7: TListOfPoints;
-  tmpGame1, tmpGame2, tmpGame3, tmpGame4, tmpGame5, tmpGame6, tmpGame7: TBlackWhiteGame;
+  k: Integer;
+  tmpNumber: Integer;
+  tmpData: TListOfPoints;
+  tmpGame: TBlackWhiteGame;
 
   tmpCurrentNode: TStateNode;
   tmpPoint: TPoint;
@@ -264,140 +195,35 @@ begin
   tmpCurrentNode := GStateTree.Head;
 
   //get all possible moves for piece.
-  tmpNumber1 := GetAllAvailableMove(tmpData1, piece);
+  tmpNumber := GetAllAvailableMove(tmpData, piece);
 
-  if tmpNumber1 > 0 then
+  if tmpNumber > 0 then
   begin
     FProgressBar.Min := 0;
-    FProgressBar.Max := tmpNumber1 - 1;
+    FProgressBar.Max := tmpNumber - 1;
     FProgressBar.Position := 0;
     FProgressBar.Visible := True;
-    for k1 := 0 to tmpNumber1 - 1 do
+    for k := 0 to tmpNumber - 1 do
     begin
-      FProgressBar.Position := k1;
+      FProgressBar.Position := k;
       Application.ProcessMessages;
-      tmpGame1 := TBlackWhiteGame.Create(Self);
-      tmpGame1.IsTempGame := True;
-      tmpPoint := tmpData1[k1];
-      tmpGame1.PlayAtMove(tmpPoint.x, tmpPoint.y, piece);
-      tmpCurrentNode := GStateTree.InsertTheNode(tmpGame1, tmpPoint.x, tmpPoint.y, tmpCurrentNode);
+      tmpGame := TBlackWhiteGame.Create(Self);
+      tmpGame.IsTempGame := True;
+      tmpPoint := tmpData[k];
+      tmpGame.PlayAtMove(tmpPoint.x, tmpPoint.y, piece);
+      tmpCurrentNode := GStateTree.InsertTheNode(tmpGame, tmpPoint.x, tmpPoint.y, tmpCurrentNode);
 
-      //get all possible moves for the opponent of piece.
-      tmpNumber2 := tmpGame1.GetAllAvailableMove(tmpData2, TBlackWhiteGame.GetOpponent(piece));
-      if tmpNumber2 > 0 then
-      begin
-        for k2 := 0 to tmpNumber2 - 1 do
-        begin
-          tmpGame2 := TBlackWhiteGame.Create(tmpGame1);
-          tmpGame2.IsTempGame := True;
-          tmpPoint := tmpData2[k2];
-          tmpGame2.PlayAtMove(tmpPoint.x, tmpPoint.y, TBlackWhiteGame.GetOpponent(piece
-          ));
-          tmpPoint := tmpData1[k1];
-          tmpCurrentNode := GStateTree.InsertTheNode(tmpGame2, tmpPoint.x, tmpPoint.y, tmpCurrentNode);
+      self.NextLevel(level, piece, tmpPoint, tmpGame, GStateTree, tmpCurrentNode);
 
-          //get all possible moves for the piece
-          tmpNumber3 := tmpGame2.GetAllAvailableMove(tmpData3, piece);
-          if tmpNumber3 > 0 then
-          begin
-            for k3 := 0 to tmpNumber3 - 1 do
-            begin
-              tmpGame3 := TBlackWhiteGame.Create(tmpGame2);
-              tmpGame3.IsTempGame := True;
-              tmpPoint := tmpData3[k3];
-              tmpGame3.PlayAtMove(tmpPoint.X, tmpPoint.Y, piece);
-              tmpPoint := tmpData1[k1];
-              tmpCurrentNode := GStateTree.InsertTheNode(tmpGame3, tmpPoint.X, tmpPoint.Y, tmpCurrentNode);
-
-              //get all possible moves for the opponent of piece
-              tmpNumber4 := tmpGame3.GetAllAvailableMove(tmpData4, TBlackWhiteGame.GetOpponent(piece
-              ));
-              if tmpNumber4 > 0 then
-              begin
-                for k4 := 0 to tmpNumber4 - 1 do
-                begin
-                  tmpGame4 := TBlackWhiteGame.Create(tmpGame3);
-                  tmpGame4.IsTempGame := True;
-                  tmpPoint := tmpData4[k4];
-                  tmpGame4.PlayAtMove(tmpPoint.X, tmpPoint.Y, TBlackWhiteGame.GetOpponent(piece));
-                  tmpPoint := tmpData1[k1];
-                  tmpCurrentNode := GStateTree.InsertTheNode(tmpGame4, tmpPoint.X, tmpPoint.Y, tmpCurrentNode);
-
-                  //get all possible moves for piece
-                  tmpNumber5 := tmpGame4.GetAllAvailableMove(tmpData5, piece);
-                  if tmpNumber5 > 0 then
-                  begin
-                    for k5 := 0 to tmpNumber5 - 1 do
-                    begin
-                      tmpGame5 := TBlackWhiteGame.Create(tmpGame4);
-                      tmpGame5.IsTempGame := True;
-                      tmpPoint := tmpData5[k5];
-                      tmpGame5.PlayAtMove(tmpPoint.X, tmpPoint.Y, piece);
-                      tmpPoint := tmpData1[k1];
-                      tmpCurrentNode := GStateTree.InsertTheNode(tmpGame5, tmpPoint.X, tmpPoint.Y, tmpCurrentNode);
-
-                      //get all possible moves for the opponent of piece
-                      {
-                      tmpNumber6 := tmpGame5.GetAllAvailableMove(tmpData6, TBlackWhiteGame.GetOpponent(piece));
-                      if tmpNumber6 > 0 then
-                      begin
-                        for k6 := 0 to tmpNumber6 - 1 do
-                        begin
-                          tmpGame6 := TBlackWhiteGame.Create(tmpGame5);
-                          tmpGame6.IsTempGame := True;
-                          tmpPoint := tmpData6[k6];
-                          tmpGame6.PlayAtMove(tmpPoint.X, tmpPoint.Y, TBlackWhiteGame.GetOpponent(piece));
-                          tmpPoint := tmpData1[k1];
-                          tmpCurrentNode := GStateTree.InsertTheNode(tmpGame6, tmpPoint.X, tmpPoint.Y, tmpCurrentNode);
-
-                          //get all possible moves for piece
-                          tmpNumber7 := tmpGame6.GetAllAvailableMove(tmpData7, piece);
-                          if tmpNumber7 > 0 then
-                          begin
-                            for k7 := 0 to tmpNumber7 - 1 do
-                            begin
-                              tmpGame7 := TBlackWhiteGame.Create(tmpGame6);
-                              tmpGame7.IsTempGame := True;
-                              tmpPoint := tmpData7[k7];
-                              tmpGame7.PlayAtMove(tmpPoint.X, tmpPoint.Y, piece);
-                              tmpPoint := tmpData1[k1];
-                              tmpCurrentNode := GStateTree.InsertTheNode(tmpGame7, tmpPoint.X, tmpPoint.Y, tmpCurrentNode);
-                              tmpCurrentNode := tmpCurrentNode.parentNode;
-                            end;
-                          end;
-                          FreeAndNil(tmpData7);
-                          tmpCurrentNode := tmpCurrentNode.parentNode;
-                        end;
-                      end;
-                      FreeAndNil(tmpData6);
-                      }
-
-                      tmpCurrentNode := tmpCurrentNode.parentNode;
-                    end;
-                  end;
-                  FreeAndNil(tmpData5);
-                  tmpCurrentNode := tmpCurrentNode.parentNode;
-                end;
-              end;
-              FreeAndNil(tmpData4);
-              tmpCurrentNode := tmpCurrentNode.parentNode;
-            end;
-          end;
-          FreeAndNil(tmpData3);
-          tmpCurrentNode := tmpCurrentNode.parentNode;
-        end;
-      end;
-      FreeAndNil(tmpData2);
       tmpCurrentNode := tmpCurrentNode.parentNode;
     end;
-
     //return a optimal result by analyzing the state tree.
     tmpPoint := Self.AnalyzeTheStateTree(GStateTree, Self.Turn);
-    i := tmpPoint.X;
-    j := tmpPoint.Y;
-    OutputDebugString(PChar(Format('Choose: %d, %d', [i + 1, j + 1])));
+    x := tmpPoint.X;
+    y := tmpPoint.Y;
+    OutputDebugString(PChar(Format('Choose: %d, %d', [x + 1, y + 1])));
     Result := true;
-    FreeAndNil(tmpData1);
+    FreeAndNil(tmpData);
     GStateTree.Print;
     FreeAndNil(GStateTree);
     FProgressBar.Visible := False;
@@ -405,7 +231,234 @@ begin
   end else
   begin
     result := False;
-    FreeAndNil(tmpData1);
+    FreeAndNil(tmpData);
+    GStateTree.Print;
+    FreeAndNil(GStateTree);
+    FProgressBar.Visible := False;
+  end;
+end;
+
+procedure TBlackWhiteGame.NextLevel(const totalLevel: Integer; piece: TPiece; const step: TPoint; gameOld: TBlackWhiteGame; var stateTree: TStateTree; var currentNode: TStateNode);
+var
+  tmpNumberOld, tmpNumberNew: Integer;
+  kOld, kNew: Integer;
+  tmpGameOld, tmpGameNew: TBlackWhiteGame;
+  tmpDataOld, tmpDataNew: TListOfPoints;
+
+  tmpPoint: TPoint;
+begin
+  tmpGameOld := gameOld;
+  //get all possible moves for the opponent of piece
+  tmpNumberOld := tmpGameOld.GetAllAvailableMove(tmpDataOld, TBlackWhiteGame.GetOpponent(piece));
+  if tmpNumberOld > 0 then
+  begin
+    for kOld := 0 to tmpNumberOld - 1 do
+    begin
+      tmpGameNew := TBlackWhiteGame.Create(tmpGameOld);
+      tmpGameNew.IsTempGame := True;
+      tmpPoint := tmpDataOld[kOld];
+      tmpGameNew.PlayAtMove(tmpPoint.x, tmpPoint.y, TBlackWhiteGame.GetOpponent(piece));
+      currentNode := GStateTree.InsertTheNode(tmpGameNew, tmpPoint.x, tmpPoint.y, currentNode);
+
+      //get all possible moves for piece
+      tmpNumberNew := tmpGameNew.GetAllAvailableMove(tmpDataNew, piece);
+      if tmpNumberNew > 0 then
+      begin
+        for kNew := 0 to tmpNumberNew - 1 do
+        begin
+          tmpGameOld := TBlackWhiteGame.Create(tmpGameNew);
+          tmpGameOld.IsTempGame := True;
+          tmpPoint := tmpDataNew[kNew];
+          tmpGameOld.PlayAtMove(tmpPoint.X, tmpPoint.Y, piece);
+          tmpPoint := step;
+          currentNode := GStateTree.InsertTheNode(tmpGameOld, tmpPoint.X, tmpPoint.Y, currentNode);
+          if TStateTree.getLevel(currentNode) <= totalLevel then
+            self.NextLevel(totalLevel, piece, step, tmpGameOld, stateTree, currentNode);
+          currentNode := currentNode.parentNode;
+        end;
+      end;
+      FreeAndNil(tmpDataNew);
+
+      currentNode := currentNode.parentNode;
+    end;
+  end;
+  FreeAndNil(tmpDataOld);
+end;
+
+//return a optimal position (i and j) for the current player which holds "piece"
+//if there is no available move, then return "false", else return "true"
+function TBlackWhiteGame.AutoPlay(var i: Integer; var j: Integer; piece: TPiece): Boolean;
+begin
+  Result := self.AnalyzeToLevel(3, i, j, piece);
+//  Result := self.GoToLevel(i, j, piece);
+end;
+
+function TBlackWhiteGame.GoToLevel(var x, y: Integer;
+  piece: TPiece): boolean;
+var
+  k, k1, k2, k3, k4, k5, k6: Integer;
+  tmpNumber, tmpNumber1, tmpNumber2, tmpNumber3, tmpNumber4, tmpNumber5, tmpNumber6: Integer;
+  tmpData, tmpData1, tmpData2, tmpData3, tmpData4, tmpData5, tmpData6: TListOfPoints;
+  tmpGame, tmpGame1, tmpGame2, tmpGame3, tmpGame4, tmpGame5, tmpGame6: TBlackWhiteGame;
+
+  tmpCurrentNode: TStateNode;
+  tmpPoint: TPoint;
+  tmpHead: TBoardGame;
+begin
+  //create the State Tree and save all possible chess state into the tree
+  tmpHead := TBlackWhiteGame.Create(Self);
+  GStateTree := TBlackWhiteGameStateTree.Create(tmpHead);
+  GStateTree.ListBox := Self.ListBox;
+  tmpCurrentNode := GStateTree.Head;
+
+  //get all possible moves for piece.
+  tmpNumber := GetAllAvailableMove(tmpData, piece);
+
+  if tmpNumber > 0 then
+  begin
+    FProgressBar.Min := 0;
+    FProgressBar.Max := tmpNumber - 1;
+    FProgressBar.Position := 0;
+    FProgressBar.Visible := True;
+    for k := 0 to tmpNumber - 1 do
+    begin
+      FProgressBar.Position := k;
+      Application.ProcessMessages;
+      tmpGame := TBlackWhiteGame.Create(Self);
+      tmpGame.IsTempGame := True;
+      tmpPoint := tmpData[k];
+      tmpGame.PlayAtMove(tmpPoint.x, tmpPoint.y, piece);
+      tmpCurrentNode := GStateTree.InsertTheNode(tmpGame, tmpPoint.x, tmpPoint.y, tmpCurrentNode);
+
+      //==========Level 1=============
+      //get all possible moves for the opponent of piece.
+      tmpNumber1 := tmpGame.GetAllAvailableMove(tmpData1, TBlackWhiteGame.GetOpponent(piece));
+      if tmpNumber1 > 0 then
+      begin
+        for k1 := 0 to tmpNumber1 - 1 do
+        begin
+          tmpGame1 := TBlackWhiteGame.Create(tmpGame);
+          tmpGame1.IsTempGame := True;
+          tmpPoint := tmpData1[k1];
+          tmpGame1.PlayAtMove(tmpPoint.x, tmpPoint.y, TBlackWhiteGame.GetOpponent(piece
+          ));
+          tmpPoint := tmpData[k];
+          tmpCurrentNode := GStateTree.InsertTheNode(tmpGame1, tmpPoint.x, tmpPoint.y, tmpCurrentNode);
+
+          //get all possible moves for the piece
+          tmpNumber2 := tmpGame1.GetAllAvailableMove(tmpData2, piece);
+          if tmpNumber2 > 0 then
+          begin
+            for k2 := 0 to tmpNumber2 - 1 do
+            begin
+              tmpGame2 := TBlackWhiteGame.Create(tmpGame1);
+              tmpGame2.IsTempGame := True;
+              tmpPoint := tmpData2[k2];
+              tmpGame2.PlayAtMove(tmpPoint.X, tmpPoint.Y, piece);
+              tmpPoint := tmpData[k];
+              tmpCurrentNode := GStateTree.InsertTheNode(tmpGame2, tmpPoint.X, tmpPoint.Y, tmpCurrentNode);
+
+              //==============Level 2===============
+
+              //get all possible moves for the opponent of piece
+              tmpNumber3 := tmpGame2.GetAllAvailableMove(tmpData3, TBlackWhiteGame.GetOpponent(piece
+              ));
+              if tmpNumber3 > 0 then
+              begin
+                for k3 := 0 to tmpNumber3 - 1 do
+                begin
+                  tmpGame3 := TBlackWhiteGame.Create(tmpGame2);
+                  tmpGame3.IsTempGame := True;
+                  tmpPoint := tmpData3[k3];
+                  tmpGame3.PlayAtMove(tmpPoint.X, tmpPoint.Y, TBlackWhiteGame.GetOpponent(piece));
+                  tmpPoint := tmpData[k];
+                  tmpCurrentNode := GStateTree.InsertTheNode(tmpGame3, tmpPoint.X, tmpPoint.Y, tmpCurrentNode);
+
+                  //get all possible moves for piece
+                  tmpNumber4 := tmpGame3.GetAllAvailableMove(tmpData4, piece);
+                  if tmpNumber4 > 0 then
+                  begin
+                    for k4 := 0 to tmpNumber4 - 1 do
+                    begin
+                      tmpGame4 := TBlackWhiteGame.Create(tmpGame3);
+                      tmpGame4.IsTempGame := True;
+                      tmpPoint := tmpData4[k4];
+                      tmpGame4.PlayAtMove(tmpPoint.X, tmpPoint.Y, piece);
+                      tmpPoint := tmpData[k];
+                      tmpCurrentNode := GStateTree.InsertTheNode(tmpGame4, tmpPoint.X, tmpPoint.Y, tmpCurrentNode);
+                      {
+                      //================Level 3 begin================
+                      //get all possible moves for the opponent of piece
+                      tmpNumber5 := tmpGame4.GetAllAvailableMove(tmpData5, TBlackWhiteGame.GetOpponent(piece));
+                      if tmpNumber5 > 0 then
+                      begin
+                        for k5 := 0 to tmpNumber5 - 1 do
+                        begin
+                          tmpGame5 := TBlackWhiteGame.Create(tmpGame4);
+                          tmpGame5.IsTempGame := True;
+                          tmpPoint := tmpData5[k5];
+                          tmpGame5.PlayAtMove(tmpPoint.X, tmpPoint.Y, TBlackWhiteGame.GetOpponent(piece));
+                          tmpPoint := tmpData[k];
+                          tmpCurrentNode := GStateTree.InsertTheNode(tmpGame5, tmpPoint.X, tmpPoint.Y, tmpCurrentNode);
+
+                          //get all possible moves for piece
+                          tmpNumber6 := tmpGame5.GetAllAvailableMove(tmpData6, piece);
+                          if tmpNumber6 > 0 then
+                          begin
+                            for k6 := 0 to tmpNumber6 - 1 do
+                            begin
+                              tmpGame6 := TBlackWhiteGame.Create(tmpGame5);
+                              tmpGame6.IsTempGame := True;
+                              tmpPoint := tmpData6[k6];
+                              tmpGame6.PlayAtMove(tmpPoint.X, tmpPoint.Y, piece);
+                              tmpPoint := tmpData[k];
+                              tmpCurrentNode := GStateTree.InsertTheNode(tmpGame6, tmpPoint.X, tmpPoint.Y, tmpCurrentNode);
+                              tmpCurrentNode := tmpCurrentNode.parentNode;
+                            end;
+                          end;
+                          FreeAndNil(tmpData6);
+                          tmpCurrentNode := tmpCurrentNode.parentNode;
+                        end;
+                      end;
+                      FreeAndNil(tmpData5);
+                      //==============Level 3 end============
+                      }
+                      tmpCurrentNode := tmpCurrentNode.parentNode;
+                    end;
+                  end;
+                  FreeAndNil(tmpData4);
+                  tmpCurrentNode := tmpCurrentNode.parentNode;
+                end;
+              end;
+              FreeAndNil(tmpData3);
+              //================Level 2 end================
+              tmpCurrentNode := tmpCurrentNode.parentNode;
+            end;
+          end;
+          FreeAndNil(tmpData2);
+          tmpCurrentNode := tmpCurrentNode.parentNode;
+        end;
+      end;
+      FreeAndNil(tmpData1);
+      //==================Level 1 end=================
+      tmpCurrentNode := tmpCurrentNode.parentNode;
+    end;
+
+    //return a optimal result by analyzing the state tree.
+    tmpPoint := Self.AnalyzeTheStateTree(GStateTree, Self.Turn);
+    x := tmpPoint.X;
+    y := tmpPoint.Y;
+    OutputDebugString(PChar(Format('Choose: %d, %d', [x + 1, y + 1])));
+    Result := true;
+    FreeAndNil(tmpData);
+    GStateTree.Print;
+    FreeAndNil(GStateTree);
+    FProgressBar.Visible := False;
+    exit;
+  end else
+  begin
+    result := False;
+    FreeAndNil(tmpData);
     GStateTree.Print;
     FreeAndNil(GStateTree);
     FProgressBar.Visible := False;
