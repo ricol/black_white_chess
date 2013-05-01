@@ -9,76 +9,44 @@ uses
 type
 
   TBlackWhiteGame = class(TBoardGame)
-  private
-    FGridColor: TColor;
-    FBlackColor: TColor;
-    FWhiteColor: TColor;
-    FTurn: TTurn;
-    FLastMove: TPoint;
-    FOldLastMove: TPoint;
-    FOldAvailableMoveData: TListOfPoints;
-    FAvailableMoveData: TListOfPoints;
-    FOldAvailableMoveNumber: Integer;
-    FAvailableMoveNumber: Integer;
-    FProgressBar: TProgressBar;
-    FListBox: TListBox;
-    procedure SetBlackColor(const Value: TColor);
-    procedure SetTurn(const Value: TTurn);
-    procedure SetWhiteColor(const Value: TColor);
-    procedure SetPiece(piece: TPiece; i, j: integer);
+  protected
     function Process(i, j, k1, k2: Integer; piece: TPiece): Integer;
     procedure Reverse(i, j, number, k1, k2: Integer);
     function GetResult(i, j: Integer; piece: TPiece): Integer;
     function GetPieceFromTurn(turn: TTurn): TPiece;
-    procedure SetGridColor(const Value: TColor);
-    procedure SetProgressBar(const Value: TProgressBar);
-    procedure SetListBox(const Value: TListBox);
     procedure ReArrange(i, j: integer; piece: TPiece);
-//    procedure AnalyzeUntilToTheLevel(level: Integer; stateTree: TStateTree; turn: TTurn);
     function AnalyzeTheStateTree(stateTree: TStateTree; turn: TTurn): TPoint;
+    procedure SetIsPlaying(const Value: Boolean); override;
+    procedure DrawBoard();
+    procedure DrawLastMove();
+    function TimeToCheck(): Boolean;
+    procedure DrawPiece(piece: TPiece; i, j: integer);
+    procedure DrawAvailableMove();
+    function GoToLevel(var x, y: Integer; piece: TPiece): boolean;
+    function AnalyzeToLevel(level: Integer; var x, y: Integer; piece: TPiece): boolean;
+    procedure NextLevel(const totalLevel: Integer; piece: TPiece; const step: TPoint; gameOld: TBlackWhiteGame; var stateTree: TStateTree; var currentNode: TStateNode);
   public
     constructor Create(PaintBox: TPaintBox; size: Integer; TempObject: Boolean); overload; override;
     constructor Create(blackWhiteGame: TBoardGame); overload; override;
     destructor Destroy(); override;
-    procedure SetIsPlaying(const Value: Boolean); override;
-    property WhiteColor: TColor read FWhiteColor write SetWhiteColor;
-    property BlackColor: TColor read FBlackColor write SetBlackColor;
-    property GridColor: TColor read FGridColor write SetGridColor;
-    property Turn: TTurn read FTurn write SetTurn;
-    property ProgressBar: TProgressBar read FProgressBar write SetProgressBar;
-    procedure About();
-    function XToJ(x: integer): integer;
-    function YToI(y: integer): integer;
-    function JToX(j: integer): integer;
-    function IToY(i: integer): integer;
-    procedure NewGame();
-    procedure CloseGame();
-    procedure DrawBoard();
-    procedure DrawLastMove();
-    function AutoPlay(var i, j: Integer; piece: TPiece): Boolean;
-    function TimeToCheck(): Boolean;
     function GetPiecesNumber(piece: TPiece): Integer;
-    procedure CheckAndEndGame();
-    procedure ResetGame;
-    procedure Refresh();
-    procedure BlinkLastMove();
     function IsAvailableMove(i, j: Integer; piece: TPiece): Boolean;
-    function GetPiece(i, j: integer): TPiece;
-    procedure DrawPiece(piece: TPiece; i, j: integer);
-    procedure DrawAllAvailableMoves(turn: TTurn);
-    function GetAllAvailableMove(var data: TListOfPoints; piece: TPiece): Integer;
     procedure PlayAtMove(i, j: Integer; piece: TPiece);
-    class function GetOpponent(piece: TPiece): TPiece;
-    property ListBox: TListBox read FListBox write SetListBox;
-    property LastMove: TPoint read FLastMove;
-    procedure DrawAvailableMove();
+    procedure CheckAndEndGame();
+    function GetAllAvailableMove(var data: TListOfPoints; piece: TPiece): Integer;
+    procedure DrawAllAvailableMoves(turn: TTurn);
+    function AutoPlay(var i, j: Integer; piece: TPiece): Boolean;
+    procedure BlinkLastMove();
+    procedure About(); override;
+    procedure NewGame(); override;
+    procedure CloseGame(); override;
+    procedure ResetGame; override;
     procedure SaveGame(); override;
     procedure LoadGame(); override;
     procedure Swap(); override;
-    function GoToLevel(var x, y: Integer; piece: TPiece): boolean;
-    function AnalyzeToLevel(level: Integer; var x, y: Integer; piece: TPiece): boolean;
-    procedure NextLevel(const totalLevel: Integer; piece: TPiece; const step: TPoint; gameOld: TBlackWhiteGame; var stateTree: TStateTree; var currentNode: TStateNode);
+    procedure Refresh(); override;
   end;
+
 
 implementation
 
@@ -289,8 +257,8 @@ end;
 //if there is no available move, then return "false", else return "true"
 function TBlackWhiteGame.AutoPlay(var i: Integer; var j: Integer; piece: TPiece): Boolean;
 begin
-  Result := self.AnalyzeToLevel(3, i, j, piece);
-//  Result := self.GoToLevel(i, j, piece);
+//  Result := self.AnalyzeToLevel(3, i, j, piece);
+  Result := self.GoToLevel(i, j, piece);
 end;
 
 function TBlackWhiteGame.GoToLevel(var x, y: Integer;
@@ -673,21 +641,6 @@ begin
   result := data.Count;
 end;
 
-function TBlackWhiteGame.YToI(y: integer): integer;
-begin
-  result := y div FLenX;
-end;
-
-function TBlackWhiteGame.XToJ(x: integer): integer;
-begin
-  result := x div FLenY;
-end;
-
-function TBlackWhiteGame.GetPiece(i, j: integer): TPiece;
-begin
-  Result := FBoard[i, j];
-end;
-
 function TBlackWhiteGame.GetResult(i, j: Integer; piece: TPiece): Integer;
 var
   tmpNumber: Integer;
@@ -720,16 +673,6 @@ begin
   result := tmpNumber;
 end;
 
-function TBlackWhiteGame.JToX(j: integer): integer;
-begin
-  result := j * FLenX;
-end;
-
-function TBlackWhiteGame.IToY(i: integer): integer;
-begin
-  result := i * FLenY;
-end;
-
 function TBlackWhiteGame.IsAvailableMove(i, j: Integer; piece: TPiece): Boolean;
 begin
   result := false;
@@ -738,6 +681,12 @@ begin
     if GetResult(i, j, piece) > 0 then
       result := true;
   end;
+end;
+
+procedure TBlackWhiteGame.LoadGame;
+begin
+  inherited;
+
 end;
 
 procedure TBlackWhiteGame.NewGame;
@@ -859,31 +808,6 @@ begin
   end;
 end;
 
-procedure TBlackWhiteGame.SetBlackColor(const Value: TColor);
-begin
-  FBlackColor := Value;
-end;
-
-procedure TBlackWhiteGame.SetPiece(piece: TPiece; i, j: integer);
-begin
-  FBoard[i, j] := piece;
-end;
-
-procedure TBlackWhiteGame.SetProgressBar(const Value: TProgressBar);
-begin
-  FProgressBar := Value;
-end;
-
-procedure TBlackWhiteGame.SetTurn(const Value: TTurn);
-begin
-  FTurn := Value;
-end;
-
-procedure TBlackWhiteGame.SetWhiteColor(const Value: TColor);
-begin
-  FWhiteColor := Value;
-end;
-
 //check whether it is time to end the game and print who wins the game
 function TBlackWhiteGame.TimeToCheck: Boolean;
 var
@@ -925,14 +849,6 @@ begin
     FLastTurn := BLACK
   else
     FLastTurn := WHITE;
-end;
-
-class function TBlackWhiteGame.GetOpponent(piece: TPiece): TPiece;
-begin
-  if piece = PIECE_WHITE then
-    Result := PIECE_BLACK
-  else
-    Result := PIECE_WHITE
 end;
 
 //for the current player, draw all possible moves
@@ -1023,34 +939,18 @@ begin
   result := tmpCount;
 end;
 
+procedure TBlackWhiteGame.SaveGame;
+begin
+  inherited;
+
+end;
+
 procedure TBlackWhiteGame.SetIsPlaying(const Value: Boolean);
 begin
   inherited;
   DrawAllAvailableMoves(Turn);
   DrawLastMove();
   Application.ProcessMessages;
-end;
-
-procedure TBlackWhiteGame.SetListBox(const Value: TListBox);
-begin
-  FListBox := Value;
-end;
-
-procedure TBlackWhiteGame.SetGridColor(const Value: TColor);
-begin
-  FGridColor := Value;
-end;
-
-procedure TBlackWhiteGame.LoadGame;
-begin
-  inherited;
-
-end;
-
-procedure TBlackWhiteGame.SaveGame;
-begin
-  inherited;
-
 end;
 
 procedure TBlackWhiteGame.Swap;

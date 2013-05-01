@@ -4,11 +4,23 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Menus, ComCtrls, ExtCtrls, ToolWin, UnitCommon;
+  Dialogs, Menus, ComCtrls, ExtCtrls, StdCtrls, ToolWin, UnitCommon;
 
 type
   TBoardGame = class
   protected
+    FBlackColor: TColor;
+    FTurn: TTurn;
+    FWhiteColor: TColor;
+    FGridColor: TColor;
+    FLastMove: TPoint;
+    FOldLastMove: TPoint;
+    FOldAvailableMoveData: TListOfPoints;
+    FAvailableMoveData: TListOfPoints;
+    FOldAvailableMoveNumber: Integer;
+    FAvailableMoveNumber: Integer;
+    FProgressBar: TProgressBar;
+    FListBox: TListBox;
     FLastTurn: TTurn;
     FIsTempGame: Boolean;
     FIsPlaying: Boolean;
@@ -34,6 +46,14 @@ type
     procedure SetSoundEffect_Regret(const Value: string); virtual;
     procedure SetSoundEffect_Win(const Value: string); virtual;
     procedure SetIsPlaying(const Value: Boolean); virtual;
+    procedure SetBlackColor(const Value: TColor);
+    procedure SetGridColor(const Value: TColor);
+    procedure SetProgressBar(const Value: TProgressBar);
+    procedure SetTurn(const Value: TTurn);
+    procedure SetWhiteColor(const Value: TColor);
+    procedure SetPiece(piece: TPiece; i, j: integer);
+    function GetPiece(i, j: integer): TPiece;
+    procedure SetListBox(const Value: TListBox);
   public
     constructor Create(PaintBox: TPaintBox; size: Integer; TempObject: Boolean); overload;virtual;
     constructor Create(boardGame: TBoardGame); overload; virtual;
@@ -49,9 +69,26 @@ type
     property IsPlaying: Boolean read FIsPlaying write SetIsPlaying;
     property IsTempGame: Boolean read FIsTempGame write SetIsTempGame;
     property LastTurn: TTurn read FLastTurn;
+    property WhiteColor: TColor read FWhiteColor write SetWhiteColor;
+    property BlackColor: TColor read FBlackColor write SetBlackColor;
+    property GridColor: TColor read FGridColor write SetGridColor;
+    property Turn: TTurn read FTurn write SetTurn;
+    property ProgressBar: TProgressBar read FProgressBar write SetProgressBar;
+    property ListBox: TListBox read FListBox write SetListBox;
+    property LastMove: TPoint read FLastMove;
+    procedure About(); virtual; abstract;
+    procedure NewGame(); virtual; abstract;
+    procedure CloseGame(); virtual; abstract;
     procedure SaveGame(); virtual; abstract;
     procedure LoadGame(); virtual; abstract;
+    procedure ResetGame; virtual; abstract;
+    procedure Refresh(); virtual; abstract;
     procedure Swap(); virtual; abstract;
+    function XToJ(x: integer): integer;
+    function YToI(y: integer): integer;
+    function JToX(j: integer): integer;
+    function IToY(i: integer): integer;
+    class function GetOpponent(piece: TPiece): TPiece;
   end;
 
 implementation
@@ -112,6 +149,16 @@ begin
   inherited;
 end;
 
+function TBoardGame.IToY(i: integer): integer;
+begin
+  result := i * FLenY;
+end;
+
+function TBoardGame.JToX(j: integer): integer;
+begin
+  result := j * FLenX;
+end;
+
 procedure TBoardGame.SetBackgroundColor(const Value: TColor);
 begin
   FBackgroundColor := Value;
@@ -122,9 +169,19 @@ begin
   FBackgroundMusic := Value;
 end;
 
+procedure TBoardGame.SetBlackColor(const Value: TColor);
+begin
+  FBlackColor := Value;
+end;
+
 procedure TBoardGame.SetDifficulty(const Value: TDifficulties);
 begin
   FDifficulty := Value;
+end;
+
+procedure TBoardGame.SetGridColor(const Value: TColor);
+begin
+  FGridColor := Value;
 end;
 
 procedure TBoardGame.SetIsPlaying(const Value: Boolean);
@@ -135,6 +192,16 @@ end;
 procedure TBoardGame.SetIsTempGame(const Value: Boolean);
 begin
   FIsTempGame := Value;
+end;
+
+procedure TBoardGame.SetListBox(const Value: TListBox);
+begin
+  FListBox := Value;
+end;
+
+procedure TBoardGame.SetProgressBar(const Value: TProgressBar);
+begin
+  FProgressBar := Value;
 end;
 
 procedure TBoardGame.SetSoundEffect_Click(const Value: string);
@@ -160,6 +227,44 @@ end;
 procedure TBoardGame.SetSoundEffect_Win(const Value: string);
 begin
   FSoundEffect_Win := Value;
+end;
+
+procedure TBoardGame.SetTurn(const Value: TTurn);
+begin
+  FTurn := Value;
+end;
+
+procedure TBoardGame.SetWhiteColor(const Value: TColor);
+begin
+  FWhiteColor := Value;
+end;
+
+function TBoardGame.XToJ(x: integer): integer;
+begin
+  result := x div FLenY;
+end;
+
+function TBoardGame.YToI(y: integer): integer;
+begin
+  result := y div FLenX;
+end;
+
+class function TBoardGame.GetOpponent(piece: TPiece): TPiece;
+begin
+  if piece = PIECE_WHITE then
+    Result := PIECE_BLACK
+  else
+    Result := PIECE_WHITE
+end;
+
+function TBoardGame.GetPiece(i, j: integer): TPiece;
+begin
+  Result := FBoard[i, j];
+end;
+
+procedure TBoardGame.SetPiece(piece: TPiece; i, j: integer);
+begin
+  FBoard[i, j] := piece;
 end;
 
 end.
