@@ -72,7 +72,7 @@ end;
 //if there is no available move, then return "false", else return "true"
 function TBlackWhiteGame.AutoPlay(var i: Integer; var j: Integer; piece: TPiece): Boolean;
 begin
-//  Result := self.AnalyzeToLevel(3, i, j, piece);
+//  Result := self.AnalyzeToLevel(2, i, j, piece);
   Result := self.GoToLevel(i, j, piece);
 end;
 
@@ -100,6 +100,7 @@ begin
     for k := 0 to tmpAllLeaves.Count - 1 do
     begin
       tmpCurrentNode := tmpAllLeaves[k];
+
       tmpGameCurrent := TBlackWhiteGame(tmpCurrentNode.data);
 
       tmpNumberOfBlack := tmpGameCurrent.GetPiecesNumber(PIECE_BLACK);
@@ -224,6 +225,9 @@ var
 
   tmpPoint: TPoint;
 begin
+  if TStateTree.getLevel(currentNode) >= 2 * totalLevel then
+    exit;
+
   tmpGameOld := gameOld;
   //get all possible moves for the opponent of piece
   tmpNumberOld := tmpGameOld.GetAllAvailableMove(tmpDataOld, TBlackWhiteGame.GetOpponent(piece));
@@ -251,8 +255,8 @@ begin
 //          self.Print(currentNode);
           currentNode := GStateTree.InsertTheNode(tmpGameOld, tmpPoint.X, tmpPoint.Y, currentNode);
 //          self.Print(currentNode);
-//          if TStateTree.getLevel(currentNode) < totalLevel then
-//            self.NextLevel(totalLevel, piece, step, tmpGameOld, stateTree, currentNode);
+          if TStateTree.getLevel(currentNode) < 2 * totalLevel then
+            self.NextLevel(totalLevel, piece, step, tmpGameOld, stateTree, currentNode);
           currentNode := currentNode.parentNode;
         end;
       end;

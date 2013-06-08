@@ -38,6 +38,8 @@ type
     MenuNetwork_Seperator2: TMenuItem;
     PaintBoxMain: TPaintBox;
     ProgressBar1: TProgressBar;
+    Hint1: TMenuItem;
+    Move1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure PaintBoxMainPaint(Sender: TObject);
@@ -48,6 +50,7 @@ type
     procedure MenuGame_ExitClick(Sender: TObject);
     procedure MenuGame_CloseGameClick(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
+    procedure Move1Click(Sender: TObject);
   private
     { Private declarations }
     procedure ProcessMessage_WM_ERASEBKGND(var tmpMessage: TMessage); message WM_ERASEBKGND;
@@ -86,7 +89,7 @@ begin
 
   FreeAndNil(GFormData);
   GFormData := TFormStateTreeData.Create(self);
-//  GFormData.Show;
+  GFormData.Show;
   GFormData.Left := Self.Left + Self.Width + 5;
   GFormData.Top := Self.Top;
 
@@ -111,6 +114,73 @@ end;
 procedure TFormMain.MenuHelp_AboutClick(Sender: TObject);
 begin
   GGame.About;
+end;
+
+procedure TFormMain.Move1Click(Sender: TObject);
+var
+  i, j, tmpNumber: integer;
+  canMove: Boolean;
+  tmpData: TListOfPoints;
+begin
+  if not GGame.IsPlaying then
+    Exit;
+  if GGame.Turn = WHITE then
+  begin
+    canMove := GGame.AutoPlay(i, j, PIECE_WHITE);
+    if canMove then
+    begin
+      GGame.PlayAtMove(i, j, PIECE_WHITE);
+      tmpNumber := GGame.GetAllAvailableMove(tmpData, PIECE_BLACK);
+      if tmpNumber = 0 then
+      begin
+        tmpNumber := GGame.GetAllAvailableMove(tmpData, PIECE_WHITE);
+        if tmpNumber = 0 then
+        begin
+          //if myself can not move either then it is time to check the game
+          GGame.CheckAndEndGame;
+          GGame.IsPlaying := False;
+          MenuGame_NewGame.Enabled := True;
+          MenuGame_CloseGame.Enabled := False;
+          exit;
+        end else begin
+          GGame.Turn := WHITE;
+          ShowMessage('White Continue.');
+        end;
+      end else
+        GGame.Turn := BLACK;
+    end else
+    begin
+      ShowMessage('No more move for white!');
+    end;
+  end else begin
+    canMove := GGame.AutoPlay(i, j, PIECE_BLACK);
+    if canMove then
+    begin
+      GGame.PlayAtMove(i, j, PIECE_BLACK);
+      tmpNumber := GGame.GetAllAvailableMove(tmpData, PIECE_WHITE);
+      if tmpNumber = 0 then
+      begin
+        tmpNumber := GGame.GetAllAvailableMove(tmpData, PIECE_BLACK);
+        if tmpNumber = 0 then
+        begin
+          //if myself can not move either then it is time to check the game
+          GGame.CheckAndEndGame;
+          GGame.IsPlaying := False;
+          MenuGame_NewGame.Enabled := True;
+          MenuGame_CloseGame.Enabled := False;
+          exit;
+        end else begin
+          GGame.Turn := BLACK;
+          ShowMessage('Black continue.');
+        end;
+      end else
+        GGame.Turn := WHITE;
+    end else
+      ShowMessage('No more move for black!');
+  end;
+
+  GGame.DrawAllAvailableMoves(GGame.Turn);
+  Application.ProcessMessages;
 end;
 
 procedure TFormMain.PaintBoxMainMouseUp(Sender: TObject;

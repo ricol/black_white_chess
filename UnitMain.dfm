@@ -1,6 +1,6 @@
 object FormMain: TFormMain
-  Left = 356
-  Top = 214
+  Left = 119
+  Top = 108
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'BlackWhiteChess - Ricol'
@@ -160,6 +160,13 @@ object FormMain: TFormMain
         Caption = 'About'
         OnClick = MenuHelp_AboutClick
       end
+    end
+    object Hint1: TMenuItem
+      Caption = 'Hint'
+    end
+    object Move1: TMenuItem
+      Caption = 'Move'
+      OnClick = Move1Click
     end
   end
 end

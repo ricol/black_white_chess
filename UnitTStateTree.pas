@@ -121,7 +121,7 @@ begin
   begin
     tmpArray_AllNodes := getAllNodes(LevelPriority);
 
-    OutputDebugString(PChar(getLevelInfor(tmpArray_AllNodes)));
+//    OutputDebugString(PChar(getLevelInfor(tmpArray_AllNodes)));
 
     tmpList := TList<TStateNode>.Create();
     for i := 0 to tmpArray_AllNodes.Count - 1 do
@@ -131,7 +131,7 @@ begin
         tmpList.Add(tmpNode);
     end;
 
-    OutputDebugString(PChar(getLevelInfor(tmpList)));
+//    OutputDebugString(PChar(getLevelInfor(tmpList)));
 
     FreeAndNil(tmpArray_AllNodes);
     Result := tmpList;
@@ -181,7 +181,7 @@ var
   tmpList: TStringList;
 begin
   // Print the State Tree
-  Exit;
+//  Exit;
   if Self.ListBox <> nil then
   begin
     tmpList := TStringList.Create;
