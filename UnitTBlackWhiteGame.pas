@@ -45,6 +45,7 @@ type
     procedure LoadGame(); override;
     procedure Swap(); override;
     procedure Refresh(); override;
+    procedure Print(node: TStateNode);
   end;
 
 
@@ -65,6 +66,14 @@ begin
              'Programmer: Ricol Wang' + #$D + #$A +
              'Date: 28/08/2012 - V1.0' + #$D + #$A +
              'Date: 01/05/2013 - V2.0', 'About', MB_OK);
+end;
+
+//return a optimal position (i and j) for the current player which holds "piece"
+//if there is no available move, then return "false", else return "true"
+function TBlackWhiteGame.AutoPlay(var i: Integer; var j: Integer; piece: TPiece): Boolean;
+begin
+//  Result := self.AnalyzeToLevel(3, i, j, piece);
+  Result := self.GoToLevel(i, j, piece);
 end;
 
 function TBlackWhiteGame.AnalyzeTheStateTree(
@@ -239,9 +248,11 @@ begin
           tmpPoint := tmpDataNew[kNew];
           tmpGameOld.PlayAtMove(tmpPoint.X, tmpPoint.Y, piece);
           tmpPoint := step;
+//          self.Print(currentNode);
           currentNode := GStateTree.InsertTheNode(tmpGameOld, tmpPoint.X, tmpPoint.Y, currentNode);
-          if TStateTree.getLevel(currentNode) <= totalLevel then
-            self.NextLevel(totalLevel, piece, step, tmpGameOld, stateTree, currentNode);
+//          self.Print(currentNode);
+//          if TStateTree.getLevel(currentNode) < totalLevel then
+//            self.NextLevel(totalLevel, piece, step, tmpGameOld, stateTree, currentNode);
           currentNode := currentNode.parentNode;
         end;
       end;
@@ -251,14 +262,6 @@ begin
     end;
   end;
   FreeAndNil(tmpDataOld);
-end;
-
-//return a optimal position (i and j) for the current player which holds "piece"
-//if there is no available move, then return "false", else return "true"
-function TBlackWhiteGame.AutoPlay(var i: Integer; var j: Integer; piece: TPiece): Boolean;
-begin
-//  Result := self.AnalyzeToLevel(3, i, j, piece);
-  Result := self.GoToLevel(i, j, piece);
 end;
 
 function TBlackWhiteGame.GoToLevel(var x, y: Integer;
@@ -704,6 +707,14 @@ begin
   Self.Turn := WHITE;
   Self.IsPlaying := True;
   Self.DrawAllAvailableMoves(WHITE);
+end;
+
+procedure TBlackWhiteGame.Print(node: TStateNode);
+var
+  tmpLevel: Integer;
+begin
+  tmpLevel := TStateTree.getLevel(node);
+  OutputDebugString(PChar(Format('CurrentNode.level: %d', [tmpLevel])));
 end;
 
 function TBlackWhiteGame.Process(i, j, k1, k2: Integer; piece: TPiece): Integer;
