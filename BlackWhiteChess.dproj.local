@@ -7,5 +7,6 @@
     <Transaction>2013-04-27 15:21:03.535.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitFormData.pas</Transaction>
     <Transaction>2013-04-27 15:21:03.535.dfm,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.dfm=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitFormData.dfm</Transaction>
     <Transaction>2013-04-28 15:10:29.874.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitTBlackWhiteGameStateTree.pas</Transaction>
+    <Transaction>2013-06-09 17:22:10.871.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitIQueryStateNodeLevel.pas</Transaction>
   </Transactions>
 </BorlandProject>
