@@ -181,7 +181,8 @@ var
   tmpList: TStringList;
 begin
   // Print the State Tree
-//  Exit;
+  if not GShowStateTreeInfor then
+    Exit;
   if Self.ListBox <> nil then
   begin
     tmpList := TStringList.Create;

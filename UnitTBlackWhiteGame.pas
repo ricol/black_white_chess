@@ -74,9 +74,9 @@ end;
 //if there is no available move, then return "false", else return "true"
 function TBlackWhiteGame.AutoPlay(var i: Integer; var j: Integer; piece: TPiece; way: TWay): Boolean;
 begin
-  if way = LOOP then
-    Result := self.GoToLevel(i, j, piece)
-  else
+//  if way = LOOP then
+//    Result := self.GoToLevel(i, j, piece)
+//  else
     Result := self.AnalyzeToLevel(2, i, j, piece);
 end;
 
@@ -386,7 +386,6 @@ begin
   tmpAllLeaves := tmpStateTree.getAllLeaves(True);
 
   tmpMax := 0;
-  tmpResult := 0;
   l := 0;
   OutputDebugString(PChar(Format('Analyzing...Total Leaves: %d', [tmpAllLeaves.Count])));
 
@@ -400,17 +399,18 @@ begin
 
       tmpNumberOfBlack := tmpGameCurrent.GetPiecesNumber(PIECE_BLACK);
       tmpNumberOfWhite := tmpGameCurrent.GetPiecesNumber(PIECE_WHITE);
+      tmpResult := tmpNumberOfWhite - tmpNumberOfBlack;
 
       if tmpNumberOfBlack <= 0 then
       begin
         l := k;
         OutputDebugString(PChar(Format('#######: Found The Optimal Result! Level %d', [TStateTree.getLevel(tmpCurrentNode)])));
+        OutputDebugString(PChar(Format('tmpResult: %d', [tmpResult])));
         Beep;
         break;
-      end else
-        tmpResult := tmpNumberOfWhite - tmpNumberOfBlack;
+      end;
 
-      if tmpResult > tmpMax then
+      if tmpResult >= tmpMax then
       begin
         l := k;
         tmpMax := tmpResult;
@@ -425,17 +425,18 @@ begin
 
       tmpNumberOfBlack := tmpGameCurrent.GetPiecesNumber(PIECE_BLACK);
       tmpNumberOfWhite := tmpGameCurrent.GetPiecesNumber(PIECE_WHITE);
+      tmpResult := tmpNumberOfBlack - tmpNumberOfWhite;
 
       if tmpNumberOfWhite <= 0 then
       begin
         l := k;
         OutputDebugString(PChar(Format('#######: Found The Optimal Result! Level %d', [TStateTree.getLevel(tmpCurrentNode)])));
+        OutputDebugString(PChar(Format('tmpResult: %d', [tmpResult])));
         Beep;
         break;
-      end else
-        tmpResult := tmpNumberOfBlack - tmpNumberOfWhite;
+      end;
 
-      if tmpResult > tmpMax then
+      if tmpResult >= tmpMax then
       begin
         l := k;
         tmpMax := tmpResult;

@@ -12,6 +12,7 @@ type
     EditSearch: TEdit;
     btnNext: TButton;
     procedure btnNextClick(Sender: TObject);
+    procedure EditSearchChange(Sender: TObject);
   private
     { Private declarations }
     currentMatch: Integer;
@@ -54,6 +55,11 @@ begin
     currentMatch := 0;
     Beep;
   end;
+end;
+
+procedure TFormStateTreeData.EditSearchChange(Sender: TObject);
+begin
+  currentMatch := 0;
 end;
 
 end.

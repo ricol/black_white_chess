@@ -41,6 +41,7 @@ object FormStateTreeData: TFormStateTreeData
     Font.Style = []
     ParentFont = False
     TabOrder = 0
+    OnChange = EditSearchChange
   end
   object btnNext: TButton
     Left = 456

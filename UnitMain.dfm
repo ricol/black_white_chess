@@ -1,6 +1,6 @@
 object FormMain: TFormMain
-  Left = 119
-  Top = 108
+  Left = 264
+  Top = 163
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'BlackWhiteChess - Ricol'
@@ -160,14 +160,24 @@ object FormMain: TFormMain
         Caption = 'About'
         OnClick = MenuHelp_AboutClick
       end
-    end
-    object AutoplayByLoop: TMenuItem
-      Caption = 'Autoplay-Loop'
-      OnClick = AutoplayByLoopClick
-    end
-    object AutoplayByRecursive: TMenuItem
-      Caption = 'Autoplay-Recursive'
-      OnClick = AutoplayByRecursiveClick
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object AutoplayByLoop: TMenuItem
+        Caption = 'Autoplay-Loop'
+        OnClick = AutoplayByLoopClick
+      end
+      object AutoplayByRecursive: TMenuItem
+        Caption = 'Autoplay-Recursive'
+        OnClick = AutoplayByRecursiveClick
+      end
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object MenuHelpStateTreeInfor: TMenuItem
+        Caption = 'State Tree Infor'
+        OnClick = MenuHelpStateTreeInforClick
+      end
     end
   end
 end

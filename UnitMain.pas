@@ -40,6 +40,9 @@ type
     ProgressBar1: TProgressBar;
     AutoplayByLoop: TMenuItem;
     AutoplayByRecursive: TMenuItem;
+    N1: TMenuItem;
+    N2: TMenuItem;
+    MenuHelpStateTreeInfor: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure PaintBoxMainPaint(Sender: TObject);
@@ -53,6 +56,7 @@ type
     procedure AutoplayByLoopClick(Sender: TObject);
     procedure Autoplay(way: TWay);
     procedure AutoplayByRecursiveClick(Sender: TObject);
+    procedure MenuHelpStateTreeInforClick(Sender: TObject);
   private
     { Private declarations }
     procedure ProcessMessage_WM_ERASEBKGND(var tmpMessage: TMessage); message WM_ERASEBKGND;
@@ -168,7 +172,7 @@ begin
 
   FreeAndNil(GFormData);
   GFormData := TFormStateTreeData.Create(self);
-  GFormData.Show;
+//  GFormData.Show;
   GFormData.Left := Self.Left + Self.Width + 5;
   GFormData.Top := Self.Top;
 
@@ -188,6 +192,13 @@ end;
 
 procedure TFormMain.ProcessMessage_WM_ERASEBKGND(var tmpMessage: TMessage);
 begin
+end;
+
+procedure TFormMain.MenuHelpStateTreeInforClick(Sender: TObject);
+begin
+  MenuHelpStateTreeInfor.Checked := not MenuHelpStateTreeInfor.Checked;
+  GFormData.Visible := MenuHelpStateTreeInfor.Checked;
+  GShowStateTreeInfor := MenuHelpStateTreeInfor.Checked;
 end;
 
 procedure TFormMain.MenuHelp_AboutClick(Sender: TObject);

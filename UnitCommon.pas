@@ -16,6 +16,9 @@ const
   COLOR_BLACK = clBlack;
   DELAYTIME = 0;
 
+var
+  GShowStateTreeInfor: Boolean = False;
+
 type
 
   TListOfPoints = TList<TPoint>;
