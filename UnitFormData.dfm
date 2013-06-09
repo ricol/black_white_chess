@@ -16,10 +16,9 @@ object FormStateTreeData: TFormStateTreeData
   TextHeight = 13
   object ListBoxMain: TListBox
     Left = 0
-    Top = 0
+    Top = 37
     Width = 535
-    Height = 517
-    Align = alClient
+    Height = 480
     Color = clBlack
     Font.Charset = ANSI_CHARSET
     Font.Color = clLime
@@ -28,7 +27,28 @@ object FormStateTreeData: TFormStateTreeData
     Font.Style = []
     ItemHeight = 13
     ParentFont = False
+    TabOrder = 2
+  end
+  object EditSearch: TEdit
+    Left = 8
+    Top = 8
+    Width = 442
+    Height = 21
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlack
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 463
+  end
+  object btnNext: TButton
+    Left = 456
+    Top = 6
+    Width = 75
+    Height = 25
+    Caption = 'next'
+    TabOrder = 1
+    OnClick = btnNextClick
   end
 end

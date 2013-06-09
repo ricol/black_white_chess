@@ -77,7 +77,7 @@ begin
   if way = LOOP then
     Result := self.GoToLevel(i, j, piece)
   else
-    Result := self.AnalyzeToLevel(1, i, j, piece);
+    Result := self.AnalyzeToLevel(2, i, j, piece);
 end;
 
 //autoplay by recursive
@@ -414,6 +414,7 @@ begin
       begin
         l := k;
         tmpMax := tmpResult;
+        OutputDebugString(PChar(Format('tmpMax: %d', [tmpMax])));
       end;
     end;
   end else begin
@@ -438,6 +439,7 @@ begin
       begin
         l := k;
         tmpMax := tmpResult;
+        OutputDebugString(PChar(Format('tmpMax: %d', [tmpMax])));
       end;
     end;
   end;

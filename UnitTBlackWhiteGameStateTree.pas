@@ -45,9 +45,14 @@ begin
       tmpString := tmpString + '-----|';
     end;
     if tmpGame.LastTurn = BLACK then
-      tmpStringTurn := 'BLACK'
+    begin
+      tmpStringTurn := 'BLACK';
+    end
     else
+    begin
       tmpStringTurn := 'WHITE';
+      tmpResult := tmpResult * -1;
+    end;
     list.Add(tmpString + Format(' [%x] %s Played at (%d, %d) -> (White: %d, Black: %d, Blank: %d) - (Result: %d)',
           [Integer(node), tmpStringTurn, tmpLastMove.X + 1, tmpLastMove.Y + 1, tmpNumberOfWhite, tmpNumberOfBlack, tmpNumberOfBlank, tmpResult]));
   end;
