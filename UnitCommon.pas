@@ -21,7 +21,7 @@ var
   GComputerCalculateLevel: Integer = 1;
 
 type
-
+  TWay = (LOOP, RECURSIVE);
   TListOfPoints = TList<TPoint>;
   TDifficulties = (DIFF_LOW, DIFF_MEDIUM, DIFF_HARD);
   TTurn = (WHITE, BLACK);

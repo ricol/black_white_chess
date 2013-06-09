@@ -6,7 +6,6 @@ uses
   Messages, Windows, SysUtils, UnitTBoardGame, UnitCommon, Generics.Collections;
 
 type
-
   TStateNode = class;
 
   TListOfNodes = TList<TStateNode>;

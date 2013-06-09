@@ -7,9 +7,6 @@ uses
   Dialogs, Menus, ComCtrls, ExtCtrls, StdCtrls, ToolWin, UnitCommon, UnitTBoardGame, UnitTStateNode, UnitTStateTree;
 
 type
-
-  TWay = (LOOP, RECURSIVE);
-
   TBlackWhiteGame = class(TBoardGame)
   protected
     function Process(i, j, k1, k2: Integer; piece: TPiece): Integer;

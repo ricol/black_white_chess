@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Menus, ComCtrls, ExtCtrls, ToolWin, UnitTBlackWhiteGame;
+  Dialogs, Menus, ComCtrls, ExtCtrls, ToolWin, UnitCommon;
 
 type
   TFormMain = class(TForm)
@@ -75,7 +75,7 @@ var
 
 implementation
 
-uses UnitCommon, UnitFormData;
+uses UnitTBlackWhiteGame, UnitFormData;
 
 {$R *.dfm}
 

@@ -7,7 +7,6 @@ uses
   Dialogs, Menus, ComCtrls, ExtCtrls, ToolWin, StdCtrls, UnitCommon, UnitTBoardGame, UnitTStateNode;
 
 type
-
   TStateTree = class abstract
   protected
     FListBox: TListBox;
