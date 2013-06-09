@@ -67,17 +67,18 @@ begin
              'Game: BlackWhiteChess' + #$D + #$A +
              'Programmer: Ricol Wang' + #$D + #$A +
              'Date: 28/08/2012 - V1.0' + #$D + #$A +
-             'Date: 01/05/2013 - V2.0', 'About', MB_OK);
+             'Date: 01/05/2013 - V2.0' + #$D + #$A +
+             'Date: 09/06/2013 - V2.1', 'About', MB_OK);
 end;
 
 //return a optimal position (i and j) for the current player which holds "piece"
 //if there is no available move, then return "false", else return "true"
 function TBlackWhiteGame.AutoPlay(var i: Integer; var j: Integer; piece: TPiece; way: TWay): Boolean;
 begin
-//  if way = LOOP then
-//    Result := self.GoToLevel(i, j, piece)
-//  else
-    Result := self.AnalyzeToLevel(2, i, j, piece);
+  if way = LOOP then
+    Result := self.GoToLevel(i, j, piece)
+  else
+    Result := self.AnalyzeToLevel(GComputerCalculateLevel, i, j, piece);
 end;
 
 //autoplay by recursive

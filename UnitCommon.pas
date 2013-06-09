@@ -18,6 +18,7 @@ const
 
 var
   GShowStateTreeInfor: Boolean = False;
+  GComputerCalculateLevel: Integer = 1;
 
 type
 

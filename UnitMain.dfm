@@ -163,6 +163,31 @@ object FormMain: TFormMain
       object N1: TMenuItem
         Caption = '-'
       end
+      object ComputerCalculateLevel1: TMenuItem
+        Caption = 'Computer Calculate Level'
+        object MenuComputerLevelLow: TMenuItem
+          AutoCheck = True
+          Caption = 'Low'
+          RadioItem = True
+          OnClick = ComputerCalculateLevelClick
+        end
+        object MenuComputerLevelMedium: TMenuItem
+          AutoCheck = True
+          Caption = 'Medium'
+          Checked = True
+          RadioItem = True
+          OnClick = ComputerCalculateLevelClick
+        end
+        object MenuComputerLevelHigh: TMenuItem
+          AutoCheck = True
+          Caption = 'High'
+          RadioItem = True
+          OnClick = ComputerCalculateLevelClick
+        end
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
       object AutoplayByLoop: TMenuItem
         Caption = 'Autoplay-Loop'
         OnClick = AutoplayByLoopClick

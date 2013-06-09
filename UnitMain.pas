@@ -43,6 +43,11 @@ type
     N1: TMenuItem;
     N2: TMenuItem;
     MenuHelpStateTreeInfor: TMenuItem;
+    N3: TMenuItem;
+    ComputerCalculateLevel1: TMenuItem;
+    MenuComputerLevelLow: TMenuItem;
+    MenuComputerLevelMedium: TMenuItem;
+    MenuComputerLevelHigh: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure PaintBoxMainPaint(Sender: TObject);
@@ -57,6 +62,7 @@ type
     procedure Autoplay(way: TWay);
     procedure AutoplayByRecursiveClick(Sender: TObject);
     procedure MenuHelpStateTreeInforClick(Sender: TObject);
+    procedure ComputerCalculateLevelClick(Sender: TObject);
   private
     { Private declarations }
     procedure ProcessMessage_WM_ERASEBKGND(var tmpMessage: TMessage); message WM_ERASEBKGND;
@@ -185,6 +191,20 @@ begin
   FreeAndNil(GFormData);
 end;
 
+procedure TFormMain.ComputerCalculateLevelClick(Sender: TObject);
+begin
+  if MenuComputerLevelLow.Checked then
+    GComputerCalculateLevel := 0
+  else if MenuComputerLevelMedium.Checked then
+    GComputerCalculateLevel := 1
+  else if MenuComputerLevelHigh.Checked then
+    GComputerCalculateLevel := 2
+  else
+    GComputerCalculateLevel := 1;
+
+  ShowMessageFmt('Computer Calculate To Round: %d', [GComputerCalculateLevel + 1]);
+end;
+
 procedure TFormMain.PaintBoxMainPaint(Sender: TObject);
 begin
   GGame.Refresh;
@@ -251,7 +271,7 @@ begin
         GGame.DrawAllAvailableMoves(GGame.Turn);
         Application.ProcessMessages;
         Sleep(DELAYTIME);
-        if GGame.AutoPlay(i, j, tmpPiece, LOOP) then
+        if GGame.AutoPlay(i, j, tmpPiece, RECURSIVE) then
         begin
           GGame.PlayAtMove(i, j, tmpPiece);
           StatusBar1.Panels[1].Text := Format('Status: %d(Black) - %d(White)', [GGame.GetPiecesNumber(PIECE_BLACK), GGame.GetPiecesNumber(PIECE_WHITE)]);
