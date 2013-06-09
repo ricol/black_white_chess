@@ -8,6 +8,8 @@ uses
 
 type
 
+  TWay = (LOOP, RECURSIVE);
+
   TBlackWhiteGame = class(TBoardGame)
   protected
     function Process(i, j, k1, k2: Integer; piece: TPiece): Integer;
@@ -32,10 +34,10 @@ type
     function GetPiecesNumber(piece: TPiece): Integer;
     function IsAvailableMove(i, j: Integer; piece: TPiece): Boolean;
     procedure PlayAtMove(i, j: Integer; piece: TPiece);
-    procedure CheckAndEndGame();
+    procedure EndGameAndPrint();
     function GetAllAvailableMove(var data: TListOfPoints; piece: TPiece): Integer;
     procedure DrawAllAvailableMoves(turn: TTurn);
-    function AutoPlay(var i, j: Integer; piece: TPiece): Boolean;
+    function AutoPlay(var i, j: Integer; piece: TPiece; way: TWay): Boolean;
     procedure BlinkLastMove();
     procedure About(); override;
     procedure NewGame(); override;
@@ -70,10 +72,12 @@ end;
 
 //return a optimal position (i and j) for the current player which holds "piece"
 //if there is no available move, then return "false", else return "true"
-function TBlackWhiteGame.AutoPlay(var i: Integer; var j: Integer; piece: TPiece): Boolean;
+function TBlackWhiteGame.AutoPlay(var i: Integer; var j: Integer; piece: TPiece; way: TWay): Boolean;
 begin
-//  Result := self.AnalyzeToLevel(2, i, j, piece);
-  Result := self.GoToLevel(i, j, piece);
+  if way = LOOP then
+    Result := self.GoToLevel(i, j, piece)
+  else
+    Result := self.AnalyzeToLevel(2, i, j, piece);
 end;
 
 function TBlackWhiteGame.AnalyzeTheStateTree(
@@ -167,6 +171,8 @@ var
   tmpHead: TBoardGame;
 begin
   //create the State Tree and save all possible chess state into the tree
+  OutputDebugString('Analyzing by recursive...');
+
   tmpHead := TBlackWhiteGame.Create(Self);
   GStateTree := TBlackWhiteGameStateTree.Create(tmpHead);
   GStateTree.ListBox := Self.ListBox;
@@ -281,6 +287,8 @@ var
   tmpHead: TBoardGame;
 begin
   //create the State Tree and save all possible chess state into the tree
+  OutputDebugString('Analyzing by loop...');
+
   tmpHead := TBlackWhiteGame.Create(Self);
   GStateTree := TBlackWhiteGameStateTree.Create(tmpHead);
   GStateTree.ListBox := Self.ListBox;
@@ -441,7 +449,7 @@ begin
 end;
 
 //Check who wins the game and end the game
-procedure TBlackWhiteGame.CheckAndEndGame;
+procedure TBlackWhiteGame.EndGameAndPrint;
 var
   tmpWhiteNumber, tmpBlackNumber: Integer;
 begin

@@ -161,12 +161,13 @@ object FormMain: TFormMain
         OnClick = MenuHelp_AboutClick
       end
     end
-    object Hint1: TMenuItem
-      Caption = 'Hint'
+    object AutoplayByLoop: TMenuItem
+      Caption = 'Autoplay-Loop'
+      OnClick = AutoplayByLoopClick
     end
-    object Move1: TMenuItem
-      Caption = 'Move'
-      OnClick = Move1Click
+    object AutoplayByRecursive: TMenuItem
+      Caption = 'Autoplay-Recursive'
+      OnClick = AutoplayByRecursiveClick
     end
   end
 end
