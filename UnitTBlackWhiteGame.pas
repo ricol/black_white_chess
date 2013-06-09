@@ -77,88 +77,10 @@ begin
   if way = LOOP then
     Result := self.GoToLevel(i, j, piece)
   else
-    Result := self.AnalyzeToLevel(2, i, j, piece);
+    Result := self.AnalyzeToLevel(1, i, j, piece);
 end;
 
-function TBlackWhiteGame.AnalyzeTheStateTree(
-  stateTree: TStateTree; turn: TTurn): TPoint;
-var
-  tmpStateTree: TStateTree;
-  tmpAllLeaves: TListOfNodes;
-  tmpCurrentNode: TStateNode;
-  tmpGameCurrent: TBlackWhiteGame;
-  tmpMax, k, l, tmpNumberOfBlack, tmpNumberOfWhite, tmpResult: Integer;
-  tmpPoint: TPoint;
-begin
-  //analyze the state tree and find the optimum node
-  tmpStateTree := stateTree;
-  tmpAllLeaves := tmpStateTree.getAllLeaves(True);
-
-  tmpMax := 0;
-  tmpResult := 0;
-  l := 0;
-  OutputDebugString(PChar(Format('Analyzing...Total Leaves: %d', [tmpAllLeaves.Count])));
-
-  if turn = WHITE then
-  begin
-    for k := 0 to tmpAllLeaves.Count - 1 do
-    begin
-      tmpCurrentNode := tmpAllLeaves[k];
-
-      tmpGameCurrent := TBlackWhiteGame(tmpCurrentNode.data);
-
-      tmpNumberOfBlack := tmpGameCurrent.GetPiecesNumber(PIECE_BLACK);
-      tmpNumberOfWhite := tmpGameCurrent.GetPiecesNumber(PIECE_WHITE);
-
-      if tmpNumberOfBlack <= 0 then
-      begin
-        l := k;
-        OutputDebugString(PChar(Format('#######: Found The Optimal Result! Level %d', [TStateTree.getLevel(tmpCurrentNode)])));
-        Beep;
-        break;
-      end else
-        tmpResult := tmpNumberOfWhite - tmpNumberOfBlack;
-
-      if tmpResult > tmpMax then
-      begin
-        l := k;
-        tmpMax := tmpResult;
-      end;
-    end;
-  end else begin
-    for k := 0 to tmpAllLeaves.Count - 1 do
-    begin
-      tmpCurrentNode := tmpAllLeaves[k];
-      tmpGameCurrent := TBlackWhiteGame(tmpCurrentNode.data);
-
-      tmpNumberOfBlack := tmpGameCurrent.GetPiecesNumber(PIECE_BLACK);
-      tmpNumberOfWhite := tmpGameCurrent.GetPiecesNumber(PIECE_WHITE);
-
-      if tmpNumberOfWhite <= 0 then
-      begin
-        l := k;
-        OutputDebugString(PChar(Format('#######: Found The Optimal Result! Level %d', [TStateTree.getLevel(tmpCurrentNode)])));
-        Beep;
-        break;
-      end else
-        tmpResult := tmpNumberOfBlack - tmpNumberOfWhite;
-
-      if tmpResult > tmpMax then
-      begin
-        l := k;
-        tmpMax := tmpResult;
-      end;
-    end;
-  end;
-
-  tmpCurrentNode := tmpAllLeaves[l];
-  tmpPoint.X := tmpCurrentNode.step_i;
-  tmpPoint.Y := tmpCurrentNode.step_j;
-  FreeAndNil(tmpAllLeaves);
-
-  Result := tmpPoint;
-end;
-
+//autoplay by recursive
 function TBlackWhiteGame.AnalyzeToLevel(level: Integer; var x, y: Integer; piece: TPiece): boolean;
 var
   k: Integer;
@@ -228,7 +150,6 @@ var
   kOld, kNew: Integer;
   tmpGameOld, tmpGameNew: TBlackWhiteGame;
   tmpDataOld, tmpDataNew: TListOfPoints;
-
   tmpPoint: TPoint;
 begin
   if TStateTree.getLevel(currentNode) >= 2 * totalLevel then
@@ -274,6 +195,7 @@ begin
   FreeAndNil(tmpDataOld);
 end;
 
+//autoplay by deep loop
 function TBlackWhiteGame.GoToLevel(var x, y: Integer;
   piece: TPiece): boolean;
 var
@@ -446,6 +368,86 @@ begin
     FreeAndNil(GStateTree);
     FProgressBar.Visible := False;
   end;
+end;
+
+//analyze the state tree and get the optimal result
+function TBlackWhiteGame.AnalyzeTheStateTree(
+  stateTree: TStateTree; turn: TTurn): TPoint;
+var
+  tmpStateTree: TStateTree;
+  tmpAllLeaves: TListOfNodes;
+  tmpCurrentNode: TStateNode;
+  tmpGameCurrent: TBlackWhiteGame;
+  tmpMax, k, l, tmpNumberOfBlack, tmpNumberOfWhite, tmpResult: Integer;
+  tmpPoint: TPoint;
+begin
+  //analyze the state tree and find the optimum node
+  tmpStateTree := stateTree;
+  tmpAllLeaves := tmpStateTree.getAllLeaves(True);
+
+  tmpMax := 0;
+  tmpResult := 0;
+  l := 0;
+  OutputDebugString(PChar(Format('Analyzing...Total Leaves: %d', [tmpAllLeaves.Count])));
+
+  if turn = WHITE then
+  begin
+    for k := 0 to tmpAllLeaves.Count - 1 do
+    begin
+      tmpCurrentNode := tmpAllLeaves[k];
+
+      tmpGameCurrent := TBlackWhiteGame(tmpCurrentNode.data);
+
+      tmpNumberOfBlack := tmpGameCurrent.GetPiecesNumber(PIECE_BLACK);
+      tmpNumberOfWhite := tmpGameCurrent.GetPiecesNumber(PIECE_WHITE);
+
+      if tmpNumberOfBlack <= 0 then
+      begin
+        l := k;
+        OutputDebugString(PChar(Format('#######: Found The Optimal Result! Level %d', [TStateTree.getLevel(tmpCurrentNode)])));
+        Beep;
+        break;
+      end else
+        tmpResult := tmpNumberOfWhite - tmpNumberOfBlack;
+
+      if tmpResult > tmpMax then
+      begin
+        l := k;
+        tmpMax := tmpResult;
+      end;
+    end;
+  end else begin
+    for k := 0 to tmpAllLeaves.Count - 1 do
+    begin
+      tmpCurrentNode := tmpAllLeaves[k];
+      tmpGameCurrent := TBlackWhiteGame(tmpCurrentNode.data);
+
+      tmpNumberOfBlack := tmpGameCurrent.GetPiecesNumber(PIECE_BLACK);
+      tmpNumberOfWhite := tmpGameCurrent.GetPiecesNumber(PIECE_WHITE);
+
+      if tmpNumberOfWhite <= 0 then
+      begin
+        l := k;
+        OutputDebugString(PChar(Format('#######: Found The Optimal Result! Level %d', [TStateTree.getLevel(tmpCurrentNode)])));
+        Beep;
+        break;
+      end else
+        tmpResult := tmpNumberOfBlack - tmpNumberOfWhite;
+
+      if tmpResult > tmpMax then
+      begin
+        l := k;
+        tmpMax := tmpResult;
+      end;
+    end;
+  end;
+
+  tmpCurrentNode := tmpAllLeaves[l];
+  tmpPoint.X := tmpCurrentNode.step_i;
+  tmpPoint.Y := tmpCurrentNode.step_j;
+  FreeAndNil(tmpAllLeaves);
+
+  Result := tmpPoint;
 end;
 
 //Check who wins the game and end the game
@@ -714,8 +716,8 @@ begin
       FBoard[i, j] := PIECE_BLANK;
   Self.PlayAtMove(4, 4, PIECE_WHITE);
   Self.PlayAtMove(4, 5, PIECE_BLACK);
-  Self.PlayAtMove(5, 4, PIECE_BLACK);
   Self.PlayAtMove(5, 5, PIECE_WHITE);
+  Self.PlayAtMove(5, 4, PIECE_BLACK);
   Self.Turn := WHITE;
   Self.IsPlaying := True;
   Self.DrawAllAvailableMoves(WHITE);
