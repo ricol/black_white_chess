@@ -63,6 +63,7 @@ type
     procedure AutoplayByRecursiveClick(Sender: TObject);
     procedure MenuHelpStateTreeInforClick(Sender: TObject);
     procedure ComputerCalculateLevelClick(Sender: TObject);
+    procedure FormResize(Sender: TObject);
   private
     { Private declarations }
     procedure ProcessMessage_WM_ERASEBKGND(var tmpMessage: TMessage); message WM_ERASEBKGND;
@@ -163,7 +164,7 @@ end;
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
   Randomize;
-  GGame := TBlackWhiteGame.Create(Self.PaintBoxMain, NUMBER, False);
+  GGame := TBlackWhiteGame.Create(Self.PaintBoxMain, NUMBER_X, NUMBER_Y, False);
   GGame.ProgressBar := Self.ProgressBar1;
 
   ProgressBar1.Parent := Self.StatusBar1;
@@ -189,6 +190,16 @@ procedure TFormMain.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(GGame);
   FreeAndNil(GFormData);
+end;
+
+procedure TFormMain.FormResize(Sender: TObject);
+begin
+  if GGame <> nil then
+  begin
+    GGame.LenX := Self.PaintBoxMain.Width div NUMBER_X;
+    GGame.LenY := Self.PaintBoxMain.Height div NUMBER_Y;
+    GGame.Refresh;
+  end;
 end;
 
 procedure TFormMain.ComputerCalculateLevelClick(Sender: TObject);
@@ -236,8 +247,11 @@ begin
   //check whether the game is playing
   if not GGame.IsPlaying then Exit;
   //get current position
-  i := GGame.YToI(Y);
-  j := GGame.XToJ(X);
+  i := GGame.XToI(X);
+  j := GGame.YToJ(Y);
+
+  if not GGame.IsValidIJ(i, j) then Exit;
+
   tmpPiece := PIECE_WHITE;
   if not GGame.IsAvailableMove(i, j, tmpPiece) then
   begin
