@@ -21,9 +21,9 @@ type
     procedure SetHead(const Value: TStateNode);
     procedure ReleaseNode(var node: TStateNode);
     procedure PrintNode(node: TStateNode; var list: TStringList); virtual; abstract;
-    procedure PrintNodeToTreeView(node: TStateNode; var treeNode: TTreeNode); virtual; abstract;
+    procedure PrintNodeToTreeView(node: TStateNode; var treeNode: TTreeNode; var treeList: TTreeNodes); virtual; abstract;
     procedure PrintRecursively(node: TStateNode; var list: TStringList);
-    procedure PrintRecursivelyToTreeView(node: TStateNode; var treeNode: TTreeNode);
+    procedure PrintRecursivelyToTreeView(node: TStateNode; var treeNode: TTreeNode; var treeList: TTreeNodes);
     function getLevelInfor(listOfNodes: TListOfNodes): String;
   public
     constructor Create(var initialGame: TBoardGame);
@@ -225,6 +225,7 @@ end;
 procedure TStateTree.PrintToTreeView;
 var
   tmpNode: TTreeNode;
+  tmpTreeList: TTreeNodes;
 begin
   TreeView.Items.Clear;
   // Print the State Tree
@@ -233,12 +234,20 @@ begin
   if Self.TreeView <> nil then
   begin
     tmpNode := nil;
-    PrintRecursivelyToTreeView(Head, tmpNode);
+    try
+//      tmpTreeList := TTreeNodes.Create(Self.TreeView);
+      tmpTreeList := Self.TreeView.Items;
+      PrintRecursivelyToTreeView(Head, tmpNode, tmpTreeList);
+//      Self.TreeView.Items := tmpTreeList;
+    finally
+//      FreeAndNil(tmpTreeList);
+    end;
+
+    TreeView.FullExpand;
   end;
-  TreeView.FullExpand;
 end;
 
-procedure TStateTree.PrintRecursivelyToTreeView(node: TStateNode; var treeNode: TTreeNode);
+procedure TStateTree.PrintRecursivelyToTreeView(node: TStateNode; var treeNode: TTreeNode; var treeList: TTreeNodes);
 var
   tmpNextNodes: TListOfNodes;
   i: Integer;
@@ -246,15 +255,15 @@ var
 begin
   if node <> nil then
   begin
-    PrintNodeToTreeView(node, treeNode);
+    PrintNodeToTreeView(node, treeNode, treeList);
     tmpNextNodes := node.nextNodes;
     if tmpNextNodes <> nil then
     begin
-      treeNode := TreeView.Items.AddChild(treeNode, '------');
+      treeNode := treeList.AddChild(treeNode, '------');
       for i := 0 to tmpNextNodes.Count - 1 do
       begin
         tmpNode := tmpNextNodes[i];
-        PrintRecursivelyToTreeView(tmpNode, treeNode);
+        PrintRecursivelyToTreeView(tmpNode, treeNode, treeList);
       end;
       treeNode := treeNode.Parent;
     end;
