@@ -187,17 +187,20 @@ var
   tmpList: TStringList;
 begin
   // Print the State Tree
+  Exit;
   if not GShowStateTreeInfor then
     Exit;
   if Self.ListBox <> nil then
   begin
+    Self.ListBox.Visible := False;
+    Application.ProcessMessages;
     tmpList := TStringList.Create;
     PrintRecursively(Head, tmpList);
     Self.ListBox.Items.Clear;
     Self.ListBox.Items.AddStrings(tmpList);
     OutputDebugString(PChar(Format('Print: %d nodes.', [tmpList.Count])));
     FreeAndNil(tmpList);
-    Application.ProcessMessages;
+    Self.ListBox.Visible := True;
   end;
 end;
 
@@ -234,6 +237,8 @@ begin
   if Self.TreeView <> nil then
   begin
     tmpNode := nil;
+    Self.TreeView.Visible := False;
+    Application.ProcessMessages;
     try
 //      tmpTreeList := TTreeNodes.Create(Self.TreeView);
       tmpTreeList := Self.TreeView.Items;
@@ -244,6 +249,7 @@ begin
     end;
 
     TreeView.FullExpand;
+    Self.TreeView.Visible := True;
   end;
 end;
 
