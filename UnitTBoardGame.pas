@@ -8,6 +8,9 @@ uses
 
 type
   TBoardGame = class
+  private
+    FTreeView: TTreeView;
+    procedure SetTreeView(const Value: TTreeView);
   protected
     FLenX: Double;
     FLenY: Double;
@@ -79,6 +82,7 @@ type
     property Turn: TTurn read FTurn write SetTurn;
     property ProgressBar: TProgressBar read FProgressBar write SetProgressBar;
     property ListBox: TListBox read FListBox write SetListBox;
+    property TreeView: TTreeView read FTreeView write SetTreeView;
     property LastMove: TPoint read FLastMove;
     property LenX: Double read FLenX write SetLenX;
     property LenY: Double read FLenY write SetLenY;
@@ -267,6 +271,11 @@ end;
 procedure TBoardGame.SetSoundEffect_Win(const Value: string);
 begin
   FSoundEffect_Win := Value;
+end;
+
+procedure TBoardGame.SetTreeView(const Value: TTreeView);
+begin
+  FTreeView := Value;
 end;
 
 procedure TBoardGame.SetTurn(const Value: TTurn);

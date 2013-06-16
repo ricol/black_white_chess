@@ -3,8 +3,8 @@ object FormMain: TFormMain
   Top = 163
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'BlackWhiteChess - Ricol'
-  ClientHeight = 417
-  ClientWidth = 398
+  ClientHeight = 410
+  ClientWidth = 391
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -47,8 +47,8 @@ object FormMain: TFormMain
   object PaintBoxMain: TPaintBox
     Left = 0
     Top = 0
-    Width = 398
-    Height = 398
+    Width = 391
+    Height = 391
     Align = alClient
     OnMouseUp = PaintBoxMainMouseUp
     OnPaint = PaintBoxMainPaint
@@ -57,8 +57,8 @@ object FormMain: TFormMain
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 398
-    Width = 398
+    Top = 391
+    Width = 391
     Height = 19
     Panels = <
       item
@@ -69,8 +69,8 @@ object FormMain: TFormMain
         Text = 'Status:'
         Width = 50
       end>
-    ExplicitTop = 400
-    ExplicitWidth = 400
+    ExplicitTop = 398
+    ExplicitWidth = 398
   end
   object ProgressBar1: TProgressBar
     Left = 136

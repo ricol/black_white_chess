@@ -46,10 +46,19 @@ object FormStateTreeData: TFormStateTreeData
   object btnNext: TButton
     Left = 456
     Top = 6
-    Width = 75
+    Width = 71
     Height = 25
     Caption = 'next'
     TabOrder = 1
     OnClick = btnNextClick
+  end
+  object TreeViewMain: TTreeView
+    Left = 0
+    Top = 37
+    Width = 535
+    Height = 480
+    Color = clBlack
+    Indent = 19
+    TabOrder = 3
   end
 end

@@ -4,13 +4,14 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls;
+  Dialogs, StdCtrls, ComCtrls;
 
 type
   TFormStateTreeData = class(TForm)
     ListBoxMain: TListBox;
     EditSearch: TEdit;
     btnNext: TButton;
+    TreeViewMain: TTreeView;
     procedure btnNextClick(Sender: TObject);
     procedure EditSearchChange(Sender: TObject);
   private

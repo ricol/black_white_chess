@@ -8,6 +8,9 @@ uses
 
 type
   TStateTree = class abstract
+  private
+    FTreeView: TTreeView;
+    procedure SetTreeView(const Value: TTreeView);
   protected
     FListBox: TListBox;
     FCurrent: TStateNode;
@@ -18,18 +21,22 @@ type
     procedure SetHead(const Value: TStateNode);
     procedure ReleaseNode(var node: TStateNode);
     procedure PrintNode(node: TStateNode; var list: TStringList); virtual; abstract;
+    procedure PrintNodeToTreeView(node: TStateNode; var treeNode: TTreeNode); virtual; abstract;
     procedure PrintRecursively(node: TStateNode; var list: TStringList);
+    procedure PrintRecursivelyToTreeView(node: TStateNode; var treeNode: TTreeNode);
     function getLevelInfor(listOfNodes: TListOfNodes): String;
   public
     constructor Create(var initialGame: TBoardGame);
     destructor Destroy(); override;
     property ListBox: TListBox read FListBox write SetListBox;
+    property TreeView: TTreeView read FTreeView write SetTreeView;
     property Head: TStateNode read FHead write SetHead;
     property Current: TStateNode read FCurrent write SetCurrent;
     function getAllLeaves(LevelPriority: Boolean): TListOfNodes;
     function InsertTheNode(ValueForTheNode: TBoardGame; i, j: Integer; InsertUnderTheNode: TStateNode): TStateNode;
     function getAllNodes(LevelPriority: Boolean): TListOfNodes;
     procedure Print;
+    procedure PrintToTreeView;
     class function getLevel(node: TStateNode): Integer;
   end;
 
@@ -215,6 +222,45 @@ begin
   end;
 end;
 
+procedure TStateTree.PrintToTreeView;
+var
+  tmpNode: TTreeNode;
+begin
+  TreeView.Items.Clear;
+  // Print the State Tree
+  if not GShowStateTreeInfor then
+    Exit;
+  if Self.TreeView <> nil then
+  begin
+    tmpNode := nil;
+    PrintRecursivelyToTreeView(Head, tmpNode);
+  end;
+  TreeView.FullExpand;
+end;
+
+procedure TStateTree.PrintRecursivelyToTreeView(node: TStateNode; var treeNode: TTreeNode);
+var
+  tmpNextNodes: TListOfNodes;
+  i: Integer;
+  tmpNode: TStateNode;
+begin
+  if node <> nil then
+  begin
+    PrintNodeToTreeView(node, treeNode);
+    tmpNextNodes := node.nextNodes;
+    if tmpNextNodes <> nil then
+    begin
+      treeNode := TreeView.Items.AddChild(treeNode, '------');
+      for i := 0 to tmpNextNodes.Count - 1 do
+      begin
+        tmpNode := tmpNextNodes[i];
+        PrintRecursivelyToTreeView(tmpNode, treeNode);
+      end;
+      treeNode := treeNode.Parent;
+    end;
+  end;
+end;
+
 procedure TStateTree.ReleaseNode(var node: TStateNode);
 var
   tmpNextNodes: TListOfNodes;
@@ -288,6 +334,11 @@ end;
 procedure TStateTree.SetListBox(const Value: TListBox);
 begin
   FListBox := Value;
+end;
+
+procedure TStateTree.SetTreeView(const Value: TTreeView);
+begin
+  FTreeView := Value;
 end;
 
 end.

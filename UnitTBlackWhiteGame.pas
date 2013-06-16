@@ -96,6 +96,7 @@ begin
   tmpHead := TBlackWhiteGame.Create(Self);
   GStateTree := TBlackWhiteGameStateTree.Create(tmpHead);
   GStateTree.ListBox := Self.ListBox;
+  GStateTree.TreeView := Self.TreeView;
   tmpCurrentNode := GStateTree.Head;
 
   //get all possible moves for piece.
@@ -129,6 +130,7 @@ begin
     Result := true;
     FreeAndNil(tmpData);
     GStateTree.Print;
+    GStateTree.PrintToTreeView;
     FreeAndNil(GStateTree);
     FProgressBar.Visible := False;
     exit;
@@ -137,6 +139,7 @@ begin
     result := False;
     FreeAndNil(tmpData);
     GStateTree.Print;
+    GStateTree.PrintToTreeView;
     FreeAndNil(GStateTree);
     FProgressBar.Visible := False;
   end;
@@ -212,6 +215,7 @@ begin
   tmpHead := TBlackWhiteGame.Create(Self);
   GStateTree := TBlackWhiteGameStateTree.Create(tmpHead);
   GStateTree.ListBox := Self.ListBox;
+  GStateTree.TreeView := Self.TreeView;
   tmpCurrentNode := GStateTree.Head;
 
   //get all possible moves for piece.
@@ -355,6 +359,7 @@ begin
     Result := true;
     FreeAndNil(tmpData);
     GStateTree.Print;
+    GStateTree.PrintToTreeView;
     FreeAndNil(GStateTree);
     FProgressBar.Visible := False;
     exit;
@@ -363,6 +368,7 @@ begin
     result := False;
     FreeAndNil(tmpData);
     GStateTree.Print;
+    GStateTree.PrintToTreeView;
     FreeAndNil(GStateTree);
     FProgressBar.Visible := False;
   end;

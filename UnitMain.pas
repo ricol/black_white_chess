@@ -184,6 +184,7 @@ begin
   GFormData.Top := Self.Top;
 
   GGame.ListBox := GFormData.ListBoxMain;
+  GGame.TreeView := GFormData.TreeViewMain;
 end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
@@ -199,6 +200,12 @@ begin
     GGame.LenX := Self.PaintBoxMain.Width div NUMBER_X;
     GGame.LenY := Self.PaintBoxMain.Height div NUMBER_Y;
     GGame.Refresh;
+  end;
+
+  if GFormData <> nil then
+  begin
+    GFormData.Left := Self.Left + Self.Width + 5;
+    GFormData.Top := Self.Top + 5;
   end;
 end;
 
