@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>2013-04-26 18:58:22.592.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitStateTree.pas</Transaction>
-    <Transaction>2013-04-26 18:58:55.529.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitStateTree.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitTStateTree.pas</Transaction>
-    <Transaction>2013-04-27 14:42:58.544.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitTStateNode.pas</Transaction>
-    <Transaction>2013-04-27 15:21:03.535.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitFormData.pas</Transaction>
-    <Transaction>2013-04-27 15:21:03.535.dfm,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.dfm=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitFormData.dfm</Transaction>
-    <Transaction>2013-04-28 15:10:29.874.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitTBlackWhiteGameStateTree.pas</Transaction>
-    <Transaction>2013-06-09 17:22:10.871.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitIQueryStateNodeLevel.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitIQueryStateNodeLevel.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitStateTree.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.dfm,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.dfm=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitFormData.dfm</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitTBlackWhiteGameStateTree.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitStateTree.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitTStateTree.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitTStateNode.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.pas,C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\Unit1.pas=C:\Documents and Settings\wangxinghe\My Documents\Programs\Delphi\Game\blackwhiteChess\UnitFormData.pas</Transaction>
   </Transactions>
 </BorlandProject>
