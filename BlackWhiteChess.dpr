@@ -2,14 +2,14 @@ program BlackWhiteChess;
 
 uses
   Forms,
-  UnitMain in 'UnitMain.pas' {FormMain},
-  UnitCommon in 'UnitCommon.pas',
-  UnitTBlackWhiteGame in 'UnitTBlackWhiteGame.pas',
-  UnitTBoardGame in 'UnitTBoardGame.pas',
-  UnitTStateTree in 'UnitTStateTree.pas',
-  UnitTStateNode in 'UnitTStateNode.pas',
-  UnitFormData in 'UnitFormData.pas' {FormStateTreeData},
-  UnitTBlackWhiteGameStateTree in 'UnitTBlackWhiteGameStateTree.pas';
+  fMain in 'fMain.pas' {FormMain},
+  Common in 'Common.pas',
+  BlackWhiteGame in 'BlackWhiteGame.pas',
+  BoardGame in 'BoardGame.pas',
+  StateTree in 'StateTree.pas',
+  StateNode in 'StateNode.pas',
+  fData in 'fData.pas' {FormStateTreeData},
+  BlackWhiteGameStateTree in 'BlackWhiteGameStateTree.pas';
 
 {$R *.res}
 

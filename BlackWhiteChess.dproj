@@ -8,7 +8,7 @@
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
-        <TargetedPlatforms>17</TargetedPlatforms>
+        <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -53,7 +53,7 @@
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <Icon_MainIcon>BlackWhiteChess_Icon.ico</Icon_MainIcon>
-        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_Namespace>System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
@@ -73,18 +73,18 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="UnitMain.pas">
+        <DCCReference Include="fMain.pas">
             <Form>FormMain</Form>
         </DCCReference>
-        <DCCReference Include="UnitCommon.pas"/>
-        <DCCReference Include="UnitTBlackWhiteGame.pas"/>
-        <DCCReference Include="UnitTBoardGame.pas"/>
-        <DCCReference Include="UnitTStateTree.pas"/>
-        <DCCReference Include="UnitTStateNode.pas"/>
-        <DCCReference Include="UnitFormData.pas">
+        <DCCReference Include="Common.pas"/>
+        <DCCReference Include="BlackWhiteGame.pas"/>
+        <DCCReference Include="BoardGame.pas"/>
+        <DCCReference Include="StateTree.pas"/>
+        <DCCReference Include="StateNode.pas"/>
+        <DCCReference Include="fData.pas">
             <Form>FormStateTreeData</Form>
         </DCCReference>
-        <DCCReference Include="UnitTBlackWhiteGameStateTree.pas"/>
+        <DCCReference Include="BlackWhiteGameStateTree.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -141,7 +141,7 @@
             </Delphi.Personality>
             <ModelSupport>False</ModelSupport>
             <Platforms>
-                <Platform value="Android" ActiveMobileDevice="rsxe5_android">True</Platform>
+                <Platform value="Android">False</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>

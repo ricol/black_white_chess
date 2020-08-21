@@ -1,10 +1,10 @@
-unit UnitTBlackWhiteGame;
+unit BlackWhiteGame;
 
 interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Menus, ComCtrls, ExtCtrls, StdCtrls, ToolWin, UnitCommon, UnitTBoardGame, UnitTStateNode, UnitTStateTree;
+  Dialogs, Menus, ComCtrls, ExtCtrls, StdCtrls, ToolWin, Common, BoardGame, StateNode, StateTree;
 
 type
   TBlackWhiteGame = class(TBoardGame)
@@ -51,7 +51,7 @@ type
 implementation
 
 uses
-  UnitTBlackWhiteGameStateTree;
+  BlackWhiteGameStateTree;
 
 var
   GStateTree: TStateTree;
