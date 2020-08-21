@@ -23,72 +23,72 @@ uses
 procedure TBlackWhiteGameStateTree.PrintNode(node: TStateNode;
   var list: TStringList);
 var
-  tmpString, tmpStringTurn: String;
-  tmpLevel: Integer;
+  s, turn: String;
+  lvl: Integer;
   i: Integer;
-  tmpGame: TBlackWhiteGame;
-  tmpLastMove: TPoint;
-  tmpNumberOfBlack, tmpNumberOfBlank, tmpNumberOfWhite, tmpResult: Integer;
+  game: TBlackWhiteGame;
+  lastMove: TPoint;
+  numBlack, numBlank, numWhite, res: Integer;
 begin
   inherited;
   if node <> nil then
   begin
-    tmpString := '|';
-    tmpLevel := getLevel(node);
-    tmpGame := TBlackWhiteGame(node.data);
-    tmpNumberOfBlack := tmpGame.GetPiecesNumber(PIECE_BLACK);
-    tmpNumberOfWhite := tmpGame.GetPiecesNumber(PIECE_WHITE);
-    tmpNumberOfBlank := tmpGame.GetPiecesNumber(PIECE_BLANK);
-    tmpResult := tmpNumberOfBlack - tmpNumberOfWhite;
-    tmpLastMove := tmpGame.LastMove;
-    for i := 0 to tmpLevel - 1 do
+    s := '|';
+    lvl := getLevel(node);
+    game := TBlackWhiteGame(node.data);
+    numBlack := game.GetPiecesNumber(PIECE_BLACK);
+    numWhite := game.GetPiecesNumber(PIECE_WHITE);
+    numBlank := game.GetPiecesNumber(PIECE_BLANK);
+    res := numBlack - numWhite;
+    lastMove := game.LastMove;
+    for i := 0 to lvl - 1 do
     begin
-      tmpString := tmpString + '-----|';
+      s := s + '-----|';
     end;
-    if tmpGame.LastTurn = BLACK then
+    if game.LastTurn = BLACK then
     begin
-      tmpStringTurn := 'BLACK';
+      turn := 'BLACK';
     end
     else
     begin
-      tmpStringTurn := 'WHITE';
-      tmpResult := tmpResult * -1;
+      turn := 'WHITE';
+      res := res * -1;
     end;
-    list.Add(tmpString + Format(' [%x] %s Played at (%d, %d) -> (White: %d, Black: %d, Blank: %d) - (Result: %d)',
-          [Integer(node), tmpStringTurn, tmpLastMove.X + 1, tmpLastMove.Y + 1, tmpNumberOfWhite, tmpNumberOfBlack, tmpNumberOfBlank, tmpResult]));
+    list.Add(s + Format(' [%x] %s Played at (%d, %d) -> (White: %d, Black: %d, Blank: %d) - (Result: %d)',
+          [Integer(node), turn, lastMove.X + 1, lastMove.Y + 1, numWhite, numBlack, numBlank, res]));
   end;
 end;
 
 procedure TBlackWhiteGameStateTree.PrintNodeToTreeView(node: TStateNode;
   var treeNode: TTreeNode; var treeList: TTreeNodes);
 var
-  tmpString, tmpStringTurn: String;
-  tmpGame: TBlackWhiteGame;
-  tmpLastMove: TPoint;
-  tmpNumberOfBlack, tmpNumberOfBlank, tmpNumberOfWhite, tmpResult: Integer;
+  s, t: String;
+  game: TBlackWhiteGame;
+  lastMove: TPoint;
+  numBlack, numBlank, numWhite, res: Integer;
 begin
   inherited;
   if node <> nil then
   begin
-    tmpGame := TBlackWhiteGame(node.data);
-    tmpNumberOfBlack := tmpGame.GetPiecesNumber(PIECE_BLACK);
-    tmpNumberOfWhite := tmpGame.GetPiecesNumber(PIECE_WHITE);
-    tmpNumberOfBlank := tmpGame.GetPiecesNumber(PIECE_BLANK);
-    tmpResult := tmpNumberOfBlack - tmpNumberOfWhite;
-    tmpLastMove := tmpGame.LastMove;
-    if tmpGame.LastTurn = BLACK then
+    game := TBlackWhiteGame(node.data);
+    numBlack := game.GetPiecesNumber(PIECE_BLACK);
+    numWhite := game.GetPiecesNumber(PIECE_WHITE);
+    numBlank := game.GetPiecesNumber(PIECE_BLANK);
+    res := numBlack - numWhite;
+    lastMove := game.LastMove;
+    if game.LastTurn = BLACK then
     begin
-      tmpStringTurn := 'BLACK';
+      t := 'BLACK';
     end
     else
     begin
-      tmpStringTurn := 'WHITE';
-      tmpResult := tmpResult * -1;
+      t := 'WHITE';
+      res := res * -1;
     end;
-    tmpString := tmpString + Format(' [%x] %s Played at (%d, %d) -> (White: %d, Black: %d, Blank: %d) - (Result: %d)',
-          [Integer(node), tmpStringTurn, tmpLastMove.X + 1, tmpLastMove.Y + 1, tmpNumberOfWhite, tmpNumberOfBlack, tmpNumberOfBlank, tmpResult]);
+    s := s + Format(' [%x] %s Played at (%d, %d) -> (White: %d, Black: %d, Blank: %d) - (Result: %d)',
+          [Integer(node), t, lastMove.X + 1, lastMove.Y + 1, numWhite, numBlack, numBlank, res]);
 
-    treeNode := treeList.Add(treeNode, tmpString);
+    treeNode := treeList.Add(treeNode, s);
   end;
 end;
 

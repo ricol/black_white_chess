@@ -30,28 +30,28 @@ implementation
 
 procedure TFormStateTreeData.btnNextClick(Sender: TObject);
 var
-  tmpStr, tmpStrItem: string;
-  I: Integer;
-  found: Boolean;
+  s, item: string;
+  i: Integer;
+  bFound: Boolean;
 begin
-  tmpStr := EditSearch.Text;
-  found := false;
-  if tmpStr <> '' then
+  s := EditSearch.Text;
+  bFound := false;
+  if s <> '' then
   begin
-    for I := currentMatch + 1 to ListBoxMain.Items.Count - 1 do
+    for i := currentMatch + 1 to ListBoxMain.Items.Count - 1 do
     begin
-      tmpStrItem := ListBoxMain.Items[i];
-      if Pos(tmpStr, tmpStrItem) > 0 then
+      item := ListBoxMain.Items[i];
+      if Pos(s, item) > 0 then
       begin
         ListBoxMain.ItemIndex := i;
         currentMatch := i;
-        found := True;
+        bFound := True;
         Break;
       end;
     end;
   end;
 
-  if not found then
+  if not bFound then
   begin
     currentMatch := 0;
     Beep;

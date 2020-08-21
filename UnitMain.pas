@@ -66,7 +66,7 @@ type
     procedure FormResize(Sender: TObject);
   private
     { Private declarations }
-    procedure ProcessMessage_WM_ERASEBKGND(var tmpMessage: TMessage); message WM_ERASEBKGND;
+    procedure ProcessMessage_WM_ERASEBKGND(var msg: TMessage); message WM_ERASEBKGND;
   public
     { Public declarations }
   end;
@@ -86,9 +86,9 @@ var
 
 procedure TFormMain.Autoplay(way: TWay);
 var
-  i, j, tmpNumber: integer;
+  i, j, num: integer;
   canMove: Boolean;
-  tmpData: TListOfPoints;
+  data: TListOfPoints;
 begin
   if not GGame.IsPlaying then
     Exit;
@@ -98,11 +98,11 @@ begin
     if canMove then
     begin
       GGame.PlayAtMove(i, j, PIECE_WHITE);
-      tmpNumber := GGame.GetAllAvailableMove(tmpData, PIECE_BLACK);
-      if tmpNumber = 0 then
+      num := GGame.GetAllAvailableMove(data, PIECE_BLACK);
+      if num = 0 then
       begin
-        tmpNumber := GGame.GetAllAvailableMove(tmpData, PIECE_WHITE);
-        if tmpNumber = 0 then
+        num := GGame.GetAllAvailableMove(data, PIECE_WHITE);
+        if num = 0 then
         begin
           //if myself can not move either then it is time to check the game
           GGame.EndGameAndPrint;
@@ -125,11 +125,11 @@ begin
     if canMove then
     begin
       GGame.PlayAtMove(i, j, PIECE_BLACK);
-      tmpNumber := GGame.GetAllAvailableMove(tmpData, PIECE_WHITE);
-      if tmpNumber = 0 then
+      num := GGame.GetAllAvailableMove(data, PIECE_WHITE);
+      if num = 0 then
       begin
-        tmpNumber := GGame.GetAllAvailableMove(tmpData, PIECE_BLACK);
-        if tmpNumber = 0 then
+        num := GGame.GetAllAvailableMove(data, PIECE_BLACK);
+        if num = 0 then
         begin
           //if myself can not move either then it is time to check the game
           GGame.EndGameAndPrint;
@@ -228,7 +228,7 @@ begin
   GGame.Refresh;
 end;
 
-procedure TFormMain.ProcessMessage_WM_ERASEBKGND(var tmpMessage: TMessage);
+procedure TFormMain.ProcessMessage_WM_ERASEBKGND(var msg: TMessage);
 begin
 end;
 
@@ -247,9 +247,9 @@ end;
 procedure TFormMain.PaintBoxMainMouseUp(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-  i, j, tmpNumber: integer;
-  tmpPiece: TPiece;
-  tmpData: TListOfPoints;
+  i, j, num: integer;
+  piece: TPiece;
+  data: TListOfPoints;
 begin
   //check whether the game is playing
   if not GGame.IsPlaying then Exit;
@@ -259,23 +259,23 @@ begin
 
   if not GGame.IsValidIJ(i, j) then Exit;
 
-  tmpPiece := PIECE_WHITE;
-  if not GGame.IsAvailableMove(i, j, tmpPiece) then
+  piece := PIECE_WHITE;
+  if not GGame.IsAvailableMove(i, j, piece) then
   begin
     //it is not a available move
     Beep;
     Exit;
   end else begin
     //it is a available move
-    GGame.PlayAtMove(i, j, tmpPiece);
+    GGame.PlayAtMove(i, j, piece);
     StatusBar1.Panels[1].Text := Format('Status: %d(Black) - %d(White)', [GGame.GetPiecesNumber(PIECE_BLACK), GGame.GetPiecesNumber(PIECE_WHITE)]);
-    tmpNumber := GGame.GetAllAvailableMove(tmpData, GGame.GetOpponent(tmpPiece));
-    if tmpNumber = 0 then
+    num := GGame.GetAllAvailableMove(data, GGame.GetOpponent(piece));
+    if num = 0 then
     begin
       Windows.Beep(1000, 50);
       //if the opponent can not move
-      tmpNumber := GGame.GetAllAvailableMove(tmpData, tmpPiece);
-      if tmpNumber = 0 then
+      num := GGame.GetAllAvailableMove(data, piece);
+      if num = 0 then
       begin
         //if myself can not move either then it is time to check the game
         GGame.EndGameAndPrint;
@@ -287,22 +287,22 @@ begin
     end else begin
       //time for the opponent which is the computer to move
       GGame.Turn := BLACK;
-      tmpPiece := PIECE_BLACK;
+      piece := PIECE_BLACK;
       repeat
         GGame.DrawAllAvailableMoves(GGame.Turn);
         Application.ProcessMessages;
         Sleep(DELAYTIME);
-        if GGame.AutoPlay(i, j, tmpPiece, RECURSIVE) then
+        if GGame.AutoPlay(i, j, piece, RECURSIVE) then
         begin
-          GGame.PlayAtMove(i, j, tmpPiece);
+          GGame.PlayAtMove(i, j, piece);
           StatusBar1.Panels[1].Text := Format('Status: %d(Black) - %d(White)', [GGame.GetPiecesNumber(PIECE_BLACK), GGame.GetPiecesNumber(PIECE_WHITE)]);
           //the opponent played, then check whether myself can move
-          tmpNumber := GGame.GetAllAvailableMove(tmpData, GGame.GetOpponent(tmpPiece));
-          if tmpNumber = 0 then
+          num := GGame.GetAllAvailableMove(data, GGame.GetOpponent(piece));
+          if num = 0 then
           begin
             Windows.Beep(2000, 50);
-            tmpNumber := GGame.GetAllAvailableMove(tmpData, tmpPiece);
-            if tmpNumber = 0 then
+            num := GGame.GetAllAvailableMove(data, piece);
+            if num = 0 then
             begin
               GGame.EndGameAndPrint;
               GGame.IsPlaying := False;

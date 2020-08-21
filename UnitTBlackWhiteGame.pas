@@ -82,53 +82,53 @@ end;
 function TBlackWhiteGame.AnalyzeToLevel(level: Integer; var x, y: Integer; piece: TPiece): boolean;
 var
   k: Integer;
-  tmpNumber: Integer;
-  tmpData: TListOfPoints;
-  tmpGame: TBlackWhiteGame;
+  num: Integer;
+  data: TListOfPoints;
+  game: TBlackWhiteGame;
 
-  tmpCurrentNode: TStateNode;
-  tmpPoint: TPoint;
-  tmpHead: TBoardGame;
+  currentNode: TStateNode;
+  point: TPoint;
+  head: TBoardGame;
 begin
   //create the State Tree and save all possible chess state into the tree
   OutputDebugString('Analyzing by recursive...');
 
-  tmpHead := TBlackWhiteGame.Create(Self);
-  GStateTree := TBlackWhiteGameStateTree.Create(tmpHead);
+  head := TBlackWhiteGame.Create(Self);
+  GStateTree := TBlackWhiteGameStateTree.Create(head);
   GStateTree.ListBox := Self.ListBox;
   GStateTree.TreeView := Self.TreeView;
-  tmpCurrentNode := GStateTree.Head;
+  currentNode := GStateTree.Head;
 
   //get all possible moves for piece.
-  tmpNumber := GetAllAvailableMove(tmpData, piece);
+  num := GetAllAvailableMove(data, piece);
 
-  if tmpNumber > 0 then
+  if num > 0 then
   begin
     FProgressBar.Min := 0;
-    FProgressBar.Max := tmpNumber - 1;
+    FProgressBar.Max := num - 1;
     FProgressBar.Position := 0;
     FProgressBar.Visible := True;
-    for k := 0 to tmpNumber - 1 do
+    for k := 0 to num - 1 do
     begin
       FProgressBar.Position := k;
       Application.ProcessMessages;
-      tmpGame := TBlackWhiteGame.Create(Self);
-      tmpGame.IsTempGame := True;
-      tmpPoint := tmpData[k];
-      tmpGame.PlayAtMove(tmpPoint.x, tmpPoint.y, piece);
-      tmpCurrentNode := GStateTree.InsertTheNode(tmpGame, tmpPoint.x, tmpPoint.y, tmpCurrentNode);
+      game := TBlackWhiteGame.Create(Self);
+      game.IsTempGame := True;
+      point := data[k];
+      game.PlayAtMove(point.x, point.y, piece);
+      currentNode := GStateTree.InsertTheNode(game, point.x, point.y, currentNode);
 
-      self.NextLevel(level, piece, tmpPoint, tmpGame, GStateTree, tmpCurrentNode);
+      self.NextLevel(level, piece, point, game, GStateTree, currentNode);
 
-      tmpCurrentNode := tmpCurrentNode.parentNode;
+      currentNode := currentNode.parentNode;
     end;
     //return a optimal result by analyzing the state tree.
-    tmpPoint := Self.AnalyzeTheStateTree(GStateTree, Self.Turn);
-    x := tmpPoint.X;
-    y := tmpPoint.Y;
+    point := Self.AnalyzeTheStateTree(GStateTree, Self.Turn);
+    x := point.X;
+    y := point.Y;
     OutputDebugString(PChar(Format('Choose: %d, %d', [x + 1, y + 1])));
     Result := true;
-    FreeAndNil(tmpData);
+    FreeAndNil(data);
     GStateTree.Print;
     GStateTree.PrintToTreeView;
     FreeAndNil(GStateTree);
@@ -137,7 +137,7 @@ begin
   end else
   begin
     result := False;
-    FreeAndNil(tmpData);
+    FreeAndNil(data);
     GStateTree.Print;
     GStateTree.PrintToTreeView;
     FreeAndNil(GStateTree);
@@ -147,53 +147,53 @@ end;
 
 procedure TBlackWhiteGame.NextLevel(const totalLevel: Integer; piece: TPiece; const step: TPoint; gameOld: TBlackWhiteGame; var stateTree: TStateTree; var currentNode: TStateNode);
 var
-  tmpNumberOld, tmpNumberNew: Integer;
+  numOld, numNew: Integer;
   kOld, kNew: Integer;
   tmpGameOld, tmpGameNew: TBlackWhiteGame;
-  tmpDataOld, tmpDataNew: TListOfPoints;
-  tmpPoint: TPoint;
+  dataOld, dataNew: TListOfPoints;
+  point: TPoint;
 begin
   if TStateTree.getLevel(currentNode) >= 2 * totalLevel then
     exit;
 
   tmpGameOld := gameOld;
   //get all possible moves for the opponent of piece
-  tmpNumberOld := tmpGameOld.GetAllAvailableMove(tmpDataOld, TBlackWhiteGame.GetOpponent(piece));
-  if tmpNumberOld > 0 then
+  numOld := tmpGameOld.GetAllAvailableMove(dataOld, TBlackWhiteGame.GetOpponent(piece));
+  if numOld > 0 then
   begin
-    for kOld := 0 to tmpNumberOld - 1 do
+    for kOld := 0 to numOld - 1 do
     begin
       tmpGameNew := TBlackWhiteGame.Create(tmpGameOld);
       tmpGameNew.IsTempGame := True;
-      tmpPoint := tmpDataOld[kOld];
-      tmpGameNew.PlayAtMove(tmpPoint.x, tmpPoint.y, TBlackWhiteGame.GetOpponent(piece));
-      currentNode := GStateTree.InsertTheNode(tmpGameNew, tmpPoint.x, tmpPoint.y, currentNode);
+      point := dataOld[kOld];
+      tmpGameNew.PlayAtMove(point.x, point.y, TBlackWhiteGame.GetOpponent(piece));
+      currentNode := GStateTree.InsertTheNode(tmpGameNew, point.x, point.y, currentNode);
 
       //get all possible moves for piece
-      tmpNumberNew := tmpGameNew.GetAllAvailableMove(tmpDataNew, piece);
-      if tmpNumberNew > 0 then
+      numNew := tmpGameNew.GetAllAvailableMove(dataNew, piece);
+      if numNew > 0 then
       begin
-        for kNew := 0 to tmpNumberNew - 1 do
+        for kNew := 0 to numNew - 1 do
         begin
           tmpGameOld := TBlackWhiteGame.Create(tmpGameNew);
           tmpGameOld.IsTempGame := True;
-          tmpPoint := tmpDataNew[kNew];
-          tmpGameOld.PlayAtMove(tmpPoint.X, tmpPoint.Y, piece);
-          tmpPoint := step;
+          point := dataNew[kNew];
+          tmpGameOld.PlayAtMove(point.X, point.Y, piece);
+          point := step;
 //          self.Print(currentNode);
-          currentNode := GStateTree.InsertTheNode(tmpGameOld, tmpPoint.X, tmpPoint.Y, currentNode);
+          currentNode := GStateTree.InsertTheNode(tmpGameOld, point.X, point.Y, currentNode);
 //          self.Print(currentNode);
           if TStateTree.getLevel(currentNode) < 2 * totalLevel then
             self.NextLevel(totalLevel, piece, step, tmpGameOld, stateTree, currentNode);
           currentNode := currentNode.parentNode;
         end;
       end;
-      FreeAndNil(tmpDataNew);
+      FreeAndNil(dataNew);
 
       currentNode := currentNode.parentNode;
     end;
   end;
-  FreeAndNil(tmpDataOld);
+  FreeAndNil(dataOld);
 end;
 
 //autoplay by deep loop
@@ -201,98 +201,98 @@ function TBlackWhiteGame.GoToLevel(var x, y: Integer;
   piece: TPiece): boolean;
 var
   k, k1, k2, k3, k4, k5, k6: Integer;
-  tmpNumber, tmpNumber1, tmpNumber2, tmpNumber3, tmpNumber4, tmpNumber5, tmpNumber6: Integer;
-  tmpData, tmpData1, tmpData2, tmpData3, tmpData4, tmpData5, tmpData6: TListOfPoints;
-  tmpGame, tmpGame1, tmpGame2, tmpGame3, tmpGame4, tmpGame5, tmpGame6: TBlackWhiteGame;
+  num, num1, num2, num3, num4, num5, num6: Integer;
+  data, data1, data2, data3, data4, data5, data6: TListOfPoints;
+  game, game1, game2, game3, game4, game5, game6: TBlackWhiteGame;
 
-  tmpCurrentNode: TStateNode;
-  tmpPoint: TPoint;
-  tmpHead: TBoardGame;
+  currentNode: TStateNode;
+  point: TPoint;
+  head: TBoardGame;
 begin
   //create the State Tree and save all possible chess state into the tree
   OutputDebugString('Analyzing by loop...');
 
-  tmpHead := TBlackWhiteGame.Create(Self);
-  GStateTree := TBlackWhiteGameStateTree.Create(tmpHead);
+  head := TBlackWhiteGame.Create(Self);
+  GStateTree := TBlackWhiteGameStateTree.Create(head);
   GStateTree.ListBox := Self.ListBox;
   GStateTree.TreeView := Self.TreeView;
-  tmpCurrentNode := GStateTree.Head;
+  currentNode := GStateTree.Head;
 
   //get all possible moves for piece.
-  tmpNumber := GetAllAvailableMove(tmpData, piece);
+  num := GetAllAvailableMove(data, piece);
 
-  if tmpNumber > 0 then
+  if num > 0 then
   begin
     FProgressBar.Min := 0;
-    FProgressBar.Max := tmpNumber - 1;
+    FProgressBar.Max := num - 1;
     FProgressBar.Position := 0;
     FProgressBar.Visible := True;
-    for k := 0 to tmpNumber - 1 do
+    for k := 0 to num - 1 do
     begin
       FProgressBar.Position := k;
       Application.ProcessMessages;
-      tmpGame := TBlackWhiteGame.Create(Self);
-      tmpGame.IsTempGame := True;
-      tmpPoint := tmpData[k];
-      tmpGame.PlayAtMove(tmpPoint.x, tmpPoint.y, piece);
-      tmpCurrentNode := GStateTree.InsertTheNode(tmpGame, tmpPoint.x, tmpPoint.y, tmpCurrentNode);
+      game := TBlackWhiteGame.Create(Self);
+      game.IsTempGame := True;
+      point := data[k];
+      game.PlayAtMove(point.x, point.y, piece);
+      currentNode := GStateTree.InsertTheNode(game, point.x, point.y, currentNode);
 
       //==========Level 1=============
       //get all possible moves for the opponent of piece.
-      tmpNumber1 := tmpGame.GetAllAvailableMove(tmpData1, TBlackWhiteGame.GetOpponent(piece));
-      if tmpNumber1 > 0 then
+      num1 := game.GetAllAvailableMove(data1, TBlackWhiteGame.GetOpponent(piece));
+      if num1 > 0 then
       begin
-        for k1 := 0 to tmpNumber1 - 1 do
+        for k1 := 0 to num1 - 1 do
         begin
-          tmpGame1 := TBlackWhiteGame.Create(tmpGame);
-          tmpGame1.IsTempGame := True;
-          tmpPoint := tmpData1[k1];
-          tmpGame1.PlayAtMove(tmpPoint.x, tmpPoint.y, TBlackWhiteGame.GetOpponent(piece
+          game1 := TBlackWhiteGame.Create(game);
+          game1.IsTempGame := True;
+          point := data1[k1];
+          game1.PlayAtMove(point.x, point.y, TBlackWhiteGame.GetOpponent(piece
           ));
-          tmpPoint := tmpData[k];
-          tmpCurrentNode := GStateTree.InsertTheNode(tmpGame1, tmpPoint.x, tmpPoint.y, tmpCurrentNode);
+          point := data[k];
+          currentNode := GStateTree.InsertTheNode(game1, point.x, point.y, currentNode);
 
           //get all possible moves for the piece
-          tmpNumber2 := tmpGame1.GetAllAvailableMove(tmpData2, piece);
-          if tmpNumber2 > 0 then
+          num2 := game1.GetAllAvailableMove(data2, piece);
+          if num2 > 0 then
           begin
-            for k2 := 0 to tmpNumber2 - 1 do
+            for k2 := 0 to num2 - 1 do
             begin
-              tmpGame2 := TBlackWhiteGame.Create(tmpGame1);
-              tmpGame2.IsTempGame := True;
-              tmpPoint := tmpData2[k2];
-              tmpGame2.PlayAtMove(tmpPoint.X, tmpPoint.Y, piece);
-              tmpPoint := tmpData[k];
-              tmpCurrentNode := GStateTree.InsertTheNode(tmpGame2, tmpPoint.X, tmpPoint.Y, tmpCurrentNode);
+              game2 := TBlackWhiteGame.Create(game1);
+              game2.IsTempGame := True;
+              point := data2[k2];
+              game2.PlayAtMove(point.X, point.Y, piece);
+              point := data[k];
+              currentNode := GStateTree.InsertTheNode(game2, point.X, point.Y, currentNode);
 
               //==============Level 2===============
 
               //get all possible moves for the opponent of piece
-              tmpNumber3 := tmpGame2.GetAllAvailableMove(tmpData3, TBlackWhiteGame.GetOpponent(piece
+              num3 := game2.GetAllAvailableMove(data3, TBlackWhiteGame.GetOpponent(piece
               ));
-              if tmpNumber3 > 0 then
+              if num3 > 0 then
               begin
-                for k3 := 0 to tmpNumber3 - 1 do
+                for k3 := 0 to num3 - 1 do
                 begin
-                  tmpGame3 := TBlackWhiteGame.Create(tmpGame2);
-                  tmpGame3.IsTempGame := True;
-                  tmpPoint := tmpData3[k3];
-                  tmpGame3.PlayAtMove(tmpPoint.X, tmpPoint.Y, TBlackWhiteGame.GetOpponent(piece));
-                  tmpPoint := tmpData[k];
-                  tmpCurrentNode := GStateTree.InsertTheNode(tmpGame3, tmpPoint.X, tmpPoint.Y, tmpCurrentNode);
+                  game3 := TBlackWhiteGame.Create(game2);
+                  game3.IsTempGame := True;
+                  point := data3[k3];
+                  game3.PlayAtMove(point.X, point.Y, TBlackWhiteGame.GetOpponent(piece));
+                  point := data[k];
+                  currentNode := GStateTree.InsertTheNode(game3, point.X, point.Y, currentNode);
 
                   //get all possible moves for piece
-                  tmpNumber4 := tmpGame3.GetAllAvailableMove(tmpData4, piece);
-                  if tmpNumber4 > 0 then
+                  num4 := game3.GetAllAvailableMove(data4, piece);
+                  if num4 > 0 then
                   begin
-                    for k4 := 0 to tmpNumber4 - 1 do
+                    for k4 := 0 to num4 - 1 do
                     begin
-                      tmpGame4 := TBlackWhiteGame.Create(tmpGame3);
-                      tmpGame4.IsTempGame := True;
-                      tmpPoint := tmpData4[k4];
-                      tmpGame4.PlayAtMove(tmpPoint.X, tmpPoint.Y, piece);
-                      tmpPoint := tmpData[k];
-                      tmpCurrentNode := GStateTree.InsertTheNode(tmpGame4, tmpPoint.X, tmpPoint.Y, tmpCurrentNode);
+                      game4 := TBlackWhiteGame.Create(game3);
+                      game4.IsTempGame := True;
+                      point := data4[k4];
+                      game4.PlayAtMove(point.X, point.Y, piece);
+                      point := data[k];
+                      currentNode := GStateTree.InsertTheNode(game4, point.X, point.Y, currentNode);
                       {
                       //================Level 3 begin================
                       //get all possible moves for the opponent of piece
@@ -330,34 +330,34 @@ begin
                       FreeAndNil(tmpData5);
                       //==============Level 3 end============
                       }
-                      tmpCurrentNode := tmpCurrentNode.parentNode;
+                      currentNode := currentNode.parentNode;
                     end;
                   end;
-                  FreeAndNil(tmpData4);
-                  tmpCurrentNode := tmpCurrentNode.parentNode;
+                  FreeAndNil(data4);
+                  currentNode := currentNode.parentNode;
                 end;
               end;
-              FreeAndNil(tmpData3);
+              FreeAndNil(data3);
               //================Level 2 end================
-              tmpCurrentNode := tmpCurrentNode.parentNode;
+              currentNode := currentNode.parentNode;
             end;
           end;
-          FreeAndNil(tmpData2);
-          tmpCurrentNode := tmpCurrentNode.parentNode;
+          FreeAndNil(data2);
+          currentNode := currentNode.parentNode;
         end;
       end;
-      FreeAndNil(tmpData1);
+      FreeAndNil(data1);
       //==================Level 1 end=================
-      tmpCurrentNode := tmpCurrentNode.parentNode;
+      currentNode := currentNode.parentNode;
     end;
 
     //return a optimal result by analyzing the state tree.
-    tmpPoint := Self.AnalyzeTheStateTree(GStateTree, Self.Turn);
-    x := tmpPoint.X;
-    y := tmpPoint.Y;
+    point := Self.AnalyzeTheStateTree(GStateTree, Self.Turn);
+    x := point.X;
+    y := point.Y;
     OutputDebugString(PChar(Format('Choose: %d, %d', [x + 1, y + 1])));
     Result := true;
-    FreeAndNil(tmpData);
+    FreeAndNil(data);
     GStateTree.Print;
     GStateTree.PrintToTreeView;
     FreeAndNil(GStateTree);
@@ -366,7 +366,7 @@ begin
   end else
   begin
     result := False;
-    FreeAndNil(tmpData);
+    FreeAndNil(data);
     GStateTree.Print;
     GStateTree.PrintToTreeView;
     FreeAndNil(GStateTree);
@@ -378,110 +378,110 @@ end;
 function TBlackWhiteGame.AnalyzeTheStateTree(
   stateTree: TStateTree; turn: TTurn): TPoint;
 var
-  tmpStateTree: TStateTree;
-  tmpAllLeaves: TListOfNodes;
-  tmpCurrentNode: TStateNode;
-  tmpGameCurrent: TBlackWhiteGame;
-  tmpMax, k, l, tmpNumberOfBlack, tmpNumberOfWhite, tmpResult: Integer;
-  tmpPoint: TPoint;
+  st: TStateTree;
+  allLeaves: TListOfNodes;
+  currentNode: TStateNode;
+  gameCurrent: TBlackWhiteGame;
+  max, k, l, numOfBlack, numOfWhite, res: Integer;
+  point: TPoint;
 begin
   //analyze the state tree and find the optimum node
-  tmpStateTree := stateTree;
-  tmpAllLeaves := tmpStateTree.getAllLeaves(True);
+  st := stateTree;
+  allLeaves := st.getAllLeaves(True);
 
-  tmpMax := 0;
+  max := 0;
   l := 0;
-  OutputDebugString(PChar(Format('Analyzing...Total Leaves: %d', [tmpAllLeaves.Count])));
+  OutputDebugString(PChar(Format('Analyzing...Total Leaves: %d', [allLeaves.Count])));
 
   if turn = WHITE then
   begin
-    for k := 0 to tmpAllLeaves.Count - 1 do
+    for k := 0 to allLeaves.Count - 1 do
     begin
-      tmpCurrentNode := tmpAllLeaves[k];
+      currentNode := allLeaves[k];
 
-      tmpGameCurrent := TBlackWhiteGame(tmpCurrentNode.data);
+      gameCurrent := TBlackWhiteGame(currentNode.data);
 
-      tmpNumberOfBlack := tmpGameCurrent.GetPiecesNumber(PIECE_BLACK);
-      tmpNumberOfWhite := tmpGameCurrent.GetPiecesNumber(PIECE_WHITE);
-      tmpResult := tmpNumberOfWhite - tmpNumberOfBlack;
+      numOfBlack := gameCurrent.GetPiecesNumber(PIECE_BLACK);
+      numOfWhite := gameCurrent.GetPiecesNumber(PIECE_WHITE);
+      res := numOfWhite - numOfBlack;
 
-      if tmpNumberOfBlack <= 0 then
+      if numOfBlack <= 0 then
       begin
         l := k;
-        OutputDebugString(PChar(Format('#######: Found The Optimal Result! Level %d', [TStateTree.getLevel(tmpCurrentNode)])));
-        OutputDebugString(PChar(Format('tmpResult: %d', [tmpResult])));
+        OutputDebugString(PChar(Format('#######: Found The Optimal Result! Level %d', [TStateTree.getLevel(currentNode)])));
+        OutputDebugString(PChar(Format('tmpResult: %d', [res])));
         Beep;
         break;
       end;
 
-      if tmpResult >= tmpMax then
+      if res >= max then
       begin
         l := k;
-        tmpMax := tmpResult;
-        OutputDebugString(PChar(Format('tmpMax: %d', [tmpMax])));
+        max := res;
+        OutputDebugString(PChar(Format('tmpMax: %d', [max])));
       end;
     end;
   end else begin
-    for k := 0 to tmpAllLeaves.Count - 1 do
+    for k := 0 to allLeaves.Count - 1 do
     begin
-      tmpCurrentNode := tmpAllLeaves[k];
-      tmpGameCurrent := TBlackWhiteGame(tmpCurrentNode.data);
+      currentNode := allLeaves[k];
+      gameCurrent := TBlackWhiteGame(currentNode.data);
 
-      tmpNumberOfBlack := tmpGameCurrent.GetPiecesNumber(PIECE_BLACK);
-      tmpNumberOfWhite := tmpGameCurrent.GetPiecesNumber(PIECE_WHITE);
-      tmpResult := tmpNumberOfBlack - tmpNumberOfWhite;
+      numOfBlack := gameCurrent.GetPiecesNumber(PIECE_BLACK);
+      numOfWhite := gameCurrent.GetPiecesNumber(PIECE_WHITE);
+      res := numOfBlack - numOfWhite;
 
-      if tmpNumberOfWhite <= 0 then
+      if numOfWhite <= 0 then
       begin
         l := k;
-        OutputDebugString(PChar(Format('#######: Found The Optimal Result! Level %d', [TStateTree.getLevel(tmpCurrentNode)])));
-        OutputDebugString(PChar(Format('tmpResult: %d', [tmpResult])));
+        OutputDebugString(PChar(Format('#######: Found The Optimal Result! Level %d', [TStateTree.getLevel(currentNode)])));
+        OutputDebugString(PChar(Format('tmpResult: %d', [res])));
         Beep;
         break;
       end;
 
-      if tmpResult >= tmpMax then
+      if res >= max then
       begin
         l := k;
-        tmpMax := tmpResult;
-        OutputDebugString(PChar(Format('tmpMax: %d', [tmpMax])));
+        max := res;
+        OutputDebugString(PChar(Format('tmpMax: %d', [max])));
       end;
     end;
   end;
 
-  tmpCurrentNode := tmpAllLeaves[l];
-  tmpPoint.X := tmpCurrentNode.step_i;
-  tmpPoint.Y := tmpCurrentNode.step_j;
-  FreeAndNil(tmpAllLeaves);
+  currentNode := allLeaves[l];
+  point.X := currentNode.step_i;
+  point.Y := currentNode.step_j;
+  FreeAndNil(allLeaves);
 
-  Result := tmpPoint;
+  Result := point;
 end;
 
 //Check who wins the game and end the game
 procedure TBlackWhiteGame.EndGameAndPrint;
 var
-  tmpWhiteNumber, tmpBlackNumber: Integer;
+  numWhite, numBlack: Integer;
 begin
   inherited;
-  tmpWhiteNumber := GetPiecesNumber(PIECE_WHITE);
-  tmpBlackNumber := GetPiecesNumber(PIECE_BLACK);
-  if tmpWhiteNumber > tmpBlackNumber then
+  numWhite := GetPiecesNumber(PIECE_WHITE);
+  numBlack := GetPiecesNumber(PIECE_BLACK);
+  if numWhite > numBlack then
   begin
     MessageBox(Application.Handle,
                PChar('Congratulation, White Win!' + #$D + #$A +
-               Format('White pieces: %d', [tmpWhiteNumber]) + #$D + #$A +
-               Format('Black pieces: %d', [tmpBlackNumber])), 'Result', MB_OK);
-  end else if tmpWhiteNumber = tmpBlackNumber then
+               Format('White pieces: %d', [numWhite]) + #$D + #$A +
+               Format('Black pieces: %d', [numBlack])), 'Result', MB_OK);
+  end else if numWhite = numBlack then
   begin
     MessageBox(Application.Handle,
                PChar('This is a draw' + #$D + #$A +
-               Format('White pieces: %d', [tmpWhiteNumber]) + #$D + #$A +
-               Format('Black pieces: %d', [tmpBlackNumber])), 'Result', MB_OK);
+               Format('White pieces: %d', [numWhite]) + #$D + #$A +
+               Format('Black pieces: %d', [numBlack])), 'Result', MB_OK);
   end else begin
     MessageBox(Application.Handle,
                PChar('Congratulation, Black Win!' + #$D + #$A +
-               Format('Black pieces: %d', [tmpBlackNumber]) + #$D + #$A +
-               Format('White pieces: %d', [tmpWhiteNumber])), 'Result', MB_OK)
+               Format('Black pieces: %d', [numBlack]) + #$D + #$A +
+               Format('White pieces: %d', [numWhite])), 'Result', MB_OK)
   end;
   IsPlaying := False;
   DrawLastMove();
@@ -500,24 +500,24 @@ end;
 //return a object whose properties and values are identical to the "blackWhiteGmae"
 constructor TBlackWhiteGame.Create(blackWhiteGame: TBoardGame);
 var
-  tmpBlackWhiteGame: TBlackWhiteGame;
+  bwGame: TBlackWhiteGame;
 begin
   inherited Create(blackWhiteGame);
-  tmpBlackWhiteGame := TBlackWhiteGame(blackWhiteGame);
-  FGridColor := tmpBlackWhiteGame.FGridColor;
-  FBlackColor := tmpBlackWhiteGame.FBlackColor;
-  FWhiteColor := tmpBlackWhiteGame.FWhiteColor;
-  FTurn := tmpBlackWhiteGame.FTurn;
-  FLastMove := tmpBlackWhiteGame.FLastMove;
-  FOldLastMove := tmpBlackWhiteGame.FOldLastMove;
-  FOldAvailableMoveNumber := tmpBlackWhiteGame.FOldAvailableMoveNumber;
+  bwGame := TBlackWhiteGame(blackWhiteGame);
+  FGridColor := bwGame.FGridColor;
+  FBlackColor := bwGame.FBlackColor;
+  FWhiteColor := bwGame.FWhiteColor;
+  FTurn := bwGame.FTurn;
+  FLastMove := bwGame.FLastMove;
+  FOldLastMove := bwGame.FOldLastMove;
+  FOldAvailableMoveNumber := bwGame.FOldAvailableMoveNumber;
   if not FIsTempGame then
   begin
-    FOldAvailableMoveData := TListOfPoints.Create(tmpBlackWhiteGame.FOldAvailableMoveData);
-    FAvailableMoveData := TListOfPoints.Create(tmpBlackWhiteGame.FAvailableMoveData);
+    FOldAvailableMoveData := TListOfPoints.Create(bwGame.FOldAvailableMoveData);
+    FAvailableMoveData := TListOfPoints.Create(bwGame.FAvailableMoveData);
   end;
-  FProgressBar := tmpBlackWhiteGame.FProgressBar;
-  FListBox := tmpBlackWhiteGame.FListBox;
+  FProgressBar := bwGame.FProgressBar;
+  FListBox := bwGame.FListBox;
 end;
 
 //constructor
@@ -548,25 +548,25 @@ end;
 //draw the chess board
 procedure TBlackWhiteGame.DrawBoard;
 var
-  tmpX, tmpY, i: Integer;
+  x, y, i: Integer;
 begin
   inherited;
   if Self.IsTempGame then Exit;
 
-  tmpX := FPaintBox.Width;
-  tmpY := FPaintBox.Height;
+  x := FPaintBox.Width;
+  y := FPaintBox.Height;
   with FPaintBox do
   begin
     Canvas.Brush.Color := FBackgroundColor;
     Canvas.Pen.Color := FGridColor;
     Canvas.Pen.Width := 1;
-    Canvas.Rectangle(0, 0, tmpX, tmpY);
+    Canvas.Rectangle(0, 0, x, y);
     for i := 0 to Self.FSizeX - 1 do
     begin
       Canvas.MoveTo(0, Trunc(FLenY * i));
-      Canvas.LineTo(tmpX, Trunc(FLenY * i));
+      Canvas.LineTo(x, Trunc(FLenY * i));
       Canvas.MoveTo(Trunc(FLenX * i), 0);
-      Canvas.LineTo(Trunc(FLenX * i), tmpY);
+      Canvas.LineTo(Trunc(FLenX * i), y);
     end;
   end;
 end;
@@ -574,44 +574,44 @@ end;
 //draw the last move and highlight the move
 procedure TBlackWhiteGame.DrawLastMove;
 var
-  tmpX, tmpY, tmpStartX, tmpStartY, tmpStartLenX, tmpStartLenY: Double;
+  x, y, startX, startY, startLenX, startLenY: Double;
 begin
   if Self.IsTempGame then Exit;
   DrawPiece(GetPiece(FOldLastMove.x, FOldLastMove.y), FOldLastMove.x, FOldLastMove.y);
   if not IsPlaying then exit;
-  tmpX := IToX(FLastMove.x);
-  tmpY := JToY(FLastMove.y);
-  tmpStartX := 3;
-  tmpStartY := 3;
-  tmpStartLenX := 5;
-  tmpStartLenY := 5;
+  x := IToX(FLastMove.x);
+  y := JToY(FLastMove.y);
+  startX := 3;
+  startY := 3;
+  startLenX := 5;
+  startLenY := 5;
   with FPaintBox do
   begin
     Canvas.Pen.Color := clRed;
     Canvas.Pen.Width := 3;
-    Canvas.MoveTo(Trunc(tmpX + tmpStartX), Trunc(tmpY + tmpStartY));
-    Canvas.LineTo(Trunc(tmpX + tmpStartX), Trunc(tmpY + tmpStartY + tmpStartLenY));
-    Canvas.MoveTo(Trunc(tmpX + tmpStartX), Trunc(tmpY + tmpStartY));
-    Canvas.LineTo(Trunc(tmpX + tmpStartX + tmpStartLenX), Trunc(tmpY + tmpStartY));
-    Canvas.MoveTo(Trunc(tmpX + tmpStartX), Trunc(tmpY + FLenY - tmpStartY));
-    Canvas.LineTo(Trunc(tmpX + tmpStartX), Trunc(tmpY + FLenY - tmpStartY - tmpStartLenY));
-    Canvas.MoveTo(Trunc(tmpX + tmpStartX), Trunc(tmpY + FLenY - tmpStartY));
-    Canvas.LineTo(Trunc(tmpX + tmpStartX + tmpStartLenX), Trunc(tmpY + FLenY - tmpStartY));
-    Canvas.MoveTo(Trunc(tmpX + FLenX - tmpStartX), Trunc(tmpY + tmpStartY));
-    Canvas.LineTo(Trunc(tmpX + FLenX - tmpStartX - tmpStartLenX), Trunc(tmpY + tmpStartY));
-    Canvas.MoveTo(Trunc(tmpX + FLenX - tmpStartX), Trunc(tmpY + tmpStartY));
-    Canvas.LineTo(Trunc(tmpX + FLenX - tmpStartX), Trunc(tmpY + tmpStartY + tmpStartLenY));
-    Canvas.MoveTo(Trunc(tmpX + FLenX - tmpStartX), Trunc(tmpY + FLenY - tmpStartY));
-    Canvas.LineTo(Trunc(tmpX + FLenX - tmpStartX - tmpStartLenX), Trunc(tmpY + FLenY - tmpStartY));
-    Canvas.MoveTo(Trunc(tmpX + FLenX - tmpStartX), Trunc(tmpY + FLenY - tmpStartY));
-    Canvas.LineTo(Trunc(tmpX + FLenX - tmpStartX), Trunc(tmpY + FLenY - tmpStartY - tmpStartLenY));
+    Canvas.MoveTo(Trunc(x + startX), Trunc(y + startY));
+    Canvas.LineTo(Trunc(x + startX), Trunc(y + startY + startLenY));
+    Canvas.MoveTo(Trunc(x + startX), Trunc(y + startY));
+    Canvas.LineTo(Trunc(x + startX + startLenX), Trunc(y + startY));
+    Canvas.MoveTo(Trunc(x + startX), Trunc(y + FLenY - startY));
+    Canvas.LineTo(Trunc(x + startX), Trunc(y + FLenY - startY - startLenY));
+    Canvas.MoveTo(Trunc(x + startX), Trunc(y + FLenY - startY));
+    Canvas.LineTo(Trunc(x + startX + startLenX), Trunc(y + FLenY - startY));
+    Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + startY));
+    Canvas.LineTo(Trunc(x + FLenX - startX - startLenX), Trunc(y + startY));
+    Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + startY));
+    Canvas.LineTo(Trunc(x + FLenX - startX), Trunc(y + startY + startLenY));
+    Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY));
+    Canvas.LineTo(Trunc(x + FLenX - startX - startLenX), Trunc(y + FLenY - startY));
+    Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY));
+    Canvas.LineTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY - startLenY));
   end;
 end;
 
 //Draw "piece" at the position "i, j"
 procedure TBlackWhiteGame.DrawPiece(piece: TPiece; i, j: integer);
 var
-  tmpX, tmpY: Double;
+  x, y: Double;
 begin
   if Self.IsTempGame then Exit;
   with FPaintBox do
@@ -619,11 +619,11 @@ begin
     Canvas.Pen.Color := FGridColor;
     Canvas.Pen.Width := 1;
     Canvas.Brush.Color := FBackgroundColor;
-    tmpX := IToX(i);
-    tmpY := JToY(j);
+    x := IToX(i);
+    y := JToY(j);
     FLenX := FPaintBox.Width div FSizeX;
     FLenY := FPaintBox.Height div FSizeY;
-    Canvas.Rectangle(Trunc(tmpX), Trunc(tmpY), Trunc(tmpX + FLenX), Trunc(tmpY + FLenY));
+    Canvas.Rectangle(Trunc(x), Trunc(y), Trunc(x + FLenX), Trunc(y + FLenY));
     if FBoard[i, j] <> PIECE_BLANK then
     begin
       if FBoard[i, j] = PIECE_WHITE then
@@ -632,9 +632,9 @@ begin
         Canvas.Brush.Color := FBlackColor;
       Canvas.Pen.Color := Canvas.Brush.Color;
       Canvas.Pen.Width := 1;
-      tmpX := IToX(i);
-      tmpY := JToY(j);
-      Canvas.Ellipse(Trunc(tmpX + 5), Trunc(tmpY + 5), Trunc(tmpX + FLenX - 5), Trunc(tmpY + FLenY - 5));
+      x := IToX(i);
+      y := JToY(j);
+      Canvas.Ellipse(Trunc(x + 5), Trunc(y + 5), Trunc(x + FLenX - 5), Trunc(y + FLenY - 5));
       if (i = FLastMove.x) and (j = FLastMove.y) then
         DrawLastMove();
     end;
@@ -645,7 +645,7 @@ end;
 function TBlackWhiteGame.GetAllAvailableMove(var data: TListOfPoints; piece: TPiece): Integer;
 var
   i, j: integer;
-  tmpPoint: TPoint;
+  point: TPoint;
 begin
   data := TListOfPoints.Create;
   data.Clear;
@@ -656,9 +656,9 @@ begin
       begin
         if IsAvailableMove(i, j, piece) then
         begin
-          tmpPoint.x := i;
-          tmpPoint.y := j;
-          data.Add(tmpPoint);
+          point.x := i;
+          point.y := j;
+          data.Add(point);
         end;
       end;
     end;
@@ -667,34 +667,34 @@ end;
 
 function TBlackWhiteGame.GetResult(i, j: Integer; piece: TPiece): Integer;
 var
-  tmpNumber: Integer;
+  num: Integer;
 begin
-  tmpNumber := 0;
+  num := 0;
   //1
   //Up
-  tmpNumber := tmpNumber + Process(i, j, -1, 0, piece);
+  num := num + Process(i, j, -1, 0, piece);
   //2
   //UpLeft
-  tmpNumber := tmpNumber + Process(i, j, -1, -1, piece);
+  num := num + Process(i, j, -1, -1, piece);
   //3
   //Left
-  tmpNumber := tmpNumber + Process(i, j, 0, -1, piece);
+  num := num + Process(i, j, 0, -1, piece);
   //4
   //DownLeft
-  tmpNumber := tmpNumber + Process(i, j, 1, -1, piece);
+  num := num + Process(i, j, 1, -1, piece);
   //5
   //Down
-  tmpNumber := tmpNumber + Process(i, j, 1, 0, piece);
+  num := num + Process(i, j, 1, 0, piece);
   //6
   //DownRight
-  tmpNumber := tmpNumber + Process(i, j, 1, 1, piece);
+  num := num + Process(i, j, 1, 1, piece);
   //7
   //Right
-  tmpNumber := tmpNumber + Process(i, j, 0, 1, piece);
+  num := num + Process(i, j, 0, 1, piece);
   //8
   //UpRight
-  tmpNumber := tmpNumber + Process(i, j, -1, 1, piece);
-  result := tmpNumber;
+  num := num + Process(i, j, -1, 1, piece);
+  result := num;
 end;
 
 function TBlackWhiteGame.IsAvailableMove(i, j: Integer; piece: TPiece): Boolean;
@@ -733,38 +733,38 @@ end;
 
 procedure TBlackWhiteGame.Print(node: TStateNode);
 var
-  tmpLevel: Integer;
+  lvl: Integer;
 begin
-  tmpLevel := TStateTree.getLevel(node);
-  OutputDebugString(PChar(Format('CurrentNode.level: %d', [tmpLevel])));
+  lvl := TStateTree.getLevel(node);
+  OutputDebugString(PChar(Format('CurrentNode.level: %d', [lvl])));
 end;
 
 function TBlackWhiteGame.Process(i, j, k1, k2: Integer; piece: TPiece): Integer;
 var
-  number, tmpK1, tmpK2: integer;
+  number, m, n: integer;
 begin
   number := 0;
   result := number;
-  tmpK1 := k1;
-  tmpK2 := k2;
-  while (i + tmpK1 < FSizeX) and (i + tmpK1 >= 0) and (j + tmpK2 < FSizeY) and (j + tmpK2 >= 0) do
+  m := k1;
+  n := k2;
+  while (i + m < FSizeX) and (i + m >= 0) and (j + n < FSizeY) and (j + n >= 0) do
   begin
-    if FBoard[i + tmpK1, j + tmpK2] <> PIECE_BLANK then
+    if FBoard[i + m, j + n] <> PIECE_BLANK then
     begin
-      if FBoard[i + tmpK1, j + tmpK2] = piece then
+      if FBoard[i + m, j + n] = piece then
       begin
         result := number;
         break;
       end else begin
         inc(number);
-        if tmpK1 > 0 then
-          inc(tmpK1)
-        else if tmpK1 < 0 then
-          dec(tmpK1);
-        if tmpK2 > 0 then
-          inc(tmpK2)
-        else if tmpK2 < 0 then
-          dec(tmpK2);
+        if m > 0 then
+          inc(m)
+        else if m < 0 then
+          dec(m);
+        if n > 0 then
+          inc(n)
+        else if n < 0 then
+          dec(n);
       end;
     end else
       break;
@@ -822,33 +822,33 @@ end;
 
 procedure TBlackWhiteGame.Reverse(i, j, number, k1, k2: Integer);
 var
-  tmpK1, tmpK2, tmpK: Integer;
+  x, y, z: Integer;
 begin
-  tmpK1 := k1;
-  tmpK2 := k2;
-  for tmpK := 1 to number do
+  x := k1;
+  y := k2;
+  for z := 1 to number do
   begin
-    Self.SetPiece(GetPiece(i, j), i + tmpK1, j + tmpK2);
-    Self.DrawPiece(GetPiece(i + tmpK1, j + tmpK2), i + tmpK1, j + tmpK2);
-    if tmpK1 > 0 then
-      inc(tmpK1)
-    else if tmpK1 < 0 then
-      dec(tmpK1);
-    if tmpK2 > 0 then
-      inc(tmpK2)
-    else if tmpK2 < 0 then
-      dec(tmpK2);
+    Self.SetPiece(GetPiece(i, j), i + x, j + y);
+    Self.DrawPiece(GetPiece(i + x, j + y), i + x, j + y);
+    if x > 0 then
+      inc(x)
+    else if x < 0 then
+      dec(x);
+    if y > 0 then
+      inc(y)
+    else if y < 0 then
+      dec(y);
   end;
 end;
 
 //check whether it is time to end the game and print who wins the game
 function TBlackWhiteGame.TimeToCheck: Boolean;
 var
-  tmpData: TListOfPoints;
+  data: TListOfPoints;
 begin
   result := false;
-  if (GetAllAvailableMove(tmpData, PIECE_WHITE) = 0) and
-     (GetAllAvailableMove(tmpData, PIECE_BLACK) = 0) then
+  if (GetAllAvailableMove(data, PIECE_WHITE) = 0) and
+     (GetAllAvailableMove(data, PIECE_BLACK) = 0) then
     result := true;
 end;
 
@@ -900,30 +900,30 @@ end;
 
 procedure TBlackWhiteGame.DrawAvailableMove();
 var
-  tmpI, tmpJ, k: Integer;
-  tmpPoint: TPoint;
-  tmpX, tmpY, tmpStartX, tmpStartY, tmpStartLenX, tmpStartLenY: Double;
+  i, j, k: Integer;
+  point: TPoint;
+  x, y, startX, startY, startLenX, startLenY: Double;
 begin
   if Self.IsTempGame then Exit;
   for k := 0 to FOldAvailableMoveNumber - 1 do
   begin
-    tmpPoint := FOldAvailableMoveData[k];
-    tmpI := tmpPoint.x;
-    tmpJ := tmpPoint.y;
-    DrawPiece(GetPiece(tmpI, tmpJ), tmpI, tmpJ);
+    point := FOldAvailableMoveData[k];
+    i := point.x;
+    j := point.y;
+    DrawPiece(GetPiece(i, j), i, j);
   end;
   if not IsPlaying then exit;
   for k := 0 to FAvailableMoveNumber - 1 do
   begin
-    tmpPoint := FAvailableMoveData[k];
-    tmpI := tmpPoint.x;
-    tmpJ := tmpPoint.y;
-    tmpX := IToX(tmpI);
-    tmpY := JToY(tmpJ);
-    tmpStartX := 3;
-    tmpStartY := 3;
-    tmpStartLenX := 5;
-    tmpStartLenY := 5;
+    point := FAvailableMoveData[k];
+    i := point.x;
+    j := point.y;
+    x := IToX(i);
+    y := JToY(j);
+    startX := 3;
+    startY := 3;
+    startLenX := 5;
+    startLenY := 5;
     with FPaintBox do
     begin
       if Turn = WHITE then
@@ -931,22 +931,22 @@ begin
       else
         Canvas.Pen.Color := COLOR_AVAILABLEMOVE_BLACK;
       Canvas.Pen.Width := 1;
-      Canvas.MoveTo(Trunc(tmpX + tmpStartX), Trunc(tmpY + tmpStartY));
-      Canvas.LineTo(Trunc(tmpX + tmpStartX), Trunc(tmpY + tmpStartY + tmpStartLenY));
-      Canvas.MoveTo(Trunc(tmpX + tmpStartX), Trunc(tmpY + tmpStartY));
-      Canvas.LineTo(Trunc(tmpX + tmpStartX + tmpStartLenX), Trunc(tmpY + tmpStartY));
-      Canvas.MoveTo(Trunc(tmpX + tmpStartX), Trunc(tmpY + FLenY - tmpStartY));
-      Canvas.LineTo(Trunc(tmpX + tmpStartX), Trunc(tmpY + FLenY - tmpStartY - tmpStartLenY));
-      Canvas.MoveTo(Trunc(tmpX + tmpStartX), Trunc(tmpY + FLenY - tmpStartY));
-      Canvas.LineTo(Trunc(tmpX + tmpStartX + tmpStartLenX), Trunc(tmpY + FLenY - tmpStartY));
-      Canvas.MoveTo(Trunc(tmpX + FLenX - tmpStartX), Trunc(tmpY + tmpStartY));
-      Canvas.LineTo(Trunc(tmpX + FLenX - tmpStartX - tmpStartLenX), Trunc(tmpY + tmpStartY));
-      Canvas.MoveTo(Trunc(tmpX + FLenX - tmpStartX), Trunc(tmpY + tmpStartY));
-      Canvas.LineTo(Trunc(tmpX + FLenX - tmpStartX), Trunc(tmpY + tmpStartY + tmpStartLenY));
-      Canvas.MoveTo(Trunc(tmpX + FLenX - tmpStartX), Trunc(tmpY + FLenY - tmpStartY));
-      Canvas.LineTo(Trunc(tmpX + FLenX - tmpStartX - tmpStartLenX), Trunc(tmpY + FLenY - tmpStartY));
-      Canvas.MoveTo(Trunc(tmpX + FLenX - tmpStartX), Trunc(tmpY + FLenY - tmpStartY));
-      Canvas.LineTo(Trunc(tmpX + FLenX - tmpStartX), Trunc(tmpY + FLenY - tmpStartY - tmpStartLenY));
+      Canvas.MoveTo(Trunc(x + startX), Trunc(y + startY));
+      Canvas.LineTo(Trunc(x + startX), Trunc(y + startY + startLenY));
+      Canvas.MoveTo(Trunc(x + startX), Trunc(y + startY));
+      Canvas.LineTo(Trunc(x + startX + startLenX), Trunc(y + startY));
+      Canvas.MoveTo(Trunc(x + startX), Trunc(y + FLenY - startY));
+      Canvas.LineTo(Trunc(x + startX), Trunc(y + FLenY - startY - startLenY));
+      Canvas.MoveTo(Trunc(x + startX), Trunc(y + FLenY - startY));
+      Canvas.LineTo(Trunc(x + startX + startLenX), Trunc(y + FLenY - startY));
+      Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + startY));
+      Canvas.LineTo(Trunc(x + FLenX - startX - startLenX), Trunc(y + startY));
+      Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + startY));
+      Canvas.LineTo(Trunc(x + FLenX - startX), Trunc(y + startY + startLenY));
+      Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY));
+      Canvas.LineTo(Trunc(x + FLenX - startX - startLenX), Trunc(y + FLenY - startY));
+      Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY));
+      Canvas.LineTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY - startLenY));
     end;
   end;
 end;
@@ -962,15 +962,15 @@ end;
 //return the count of "piece" on the current board
 function TBlackWhiteGame.GetPiecesNumber(piece: TPiece): Integer;
 var
-  tmpCount, i, j: Integer;
+  count, i, j: Integer;
 begin
-  tmpCount := 0;
+  count := 0;
   for i := 0 to FSizeX - 1 do
     for j := 0 to FSizeY - 1 do
     begin
-      if FBoard[i, j] = piece then inc(tmpCount);
+      if FBoard[i, j] = piece then inc(count);
     end;
-  result := tmpCount;
+  result := count;
 end;
 
 procedure TBlackWhiteGame.SaveGame;
