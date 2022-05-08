@@ -555,18 +555,18 @@ begin
 
   x := FPaintBox.Width;
   y := FPaintBox.Height;
-  with FPaintBox do
+  with FPaintBox.Canvas do
   begin
-    Canvas.Brush.Color := FBackgroundColor;
-    Canvas.Pen.Color := FGridColor;
-    Canvas.Pen.Width := 1;
-    Canvas.Rectangle(0, 0, x, y);
+    Brush.Color := FBackgroundColor;
+    Pen.Color := FGridColor;
+    Pen.Width := 1;
+    Rectangle(0, 0, x, y);
     for i := 0 to Self.FSizeX - 1 do
     begin
-      Canvas.MoveTo(0, Trunc(FLenY * i));
-      Canvas.LineTo(x, Trunc(FLenY * i));
-      Canvas.MoveTo(Trunc(FLenX * i), 0);
-      Canvas.LineTo(Trunc(FLenX * i), y);
+      MoveTo(0, Trunc(FLenY * i));
+      LineTo(x, Trunc(FLenY * i));
+      MoveTo(Trunc(FLenX * i), 0);
+      LineTo(Trunc(FLenX * i), y);
     end;
   end;
 end;
@@ -585,26 +585,26 @@ begin
   startY := 3;
   startLenX := 5;
   startLenY := 5;
-  with FPaintBox do
+  with FPaintBox.Canvas do
   begin
-    Canvas.Pen.Color := clRed;
-    Canvas.Pen.Width := 3;
-    Canvas.MoveTo(Trunc(x + startX), Trunc(y + startY));
-    Canvas.LineTo(Trunc(x + startX), Trunc(y + startY + startLenY));
-    Canvas.MoveTo(Trunc(x + startX), Trunc(y + startY));
-    Canvas.LineTo(Trunc(x + startX + startLenX), Trunc(y + startY));
-    Canvas.MoveTo(Trunc(x + startX), Trunc(y + FLenY - startY));
-    Canvas.LineTo(Trunc(x + startX), Trunc(y + FLenY - startY - startLenY));
-    Canvas.MoveTo(Trunc(x + startX), Trunc(y + FLenY - startY));
-    Canvas.LineTo(Trunc(x + startX + startLenX), Trunc(y + FLenY - startY));
-    Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + startY));
-    Canvas.LineTo(Trunc(x + FLenX - startX - startLenX), Trunc(y + startY));
-    Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + startY));
-    Canvas.LineTo(Trunc(x + FLenX - startX), Trunc(y + startY + startLenY));
-    Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY));
-    Canvas.LineTo(Trunc(x + FLenX - startX - startLenX), Trunc(y + FLenY - startY));
-    Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY));
-    Canvas.LineTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY - startLenY));
+    Pen.Color := clRed;
+    Pen.Width := 3;
+    MoveTo(Trunc(x + startX), Trunc(y + startY));
+    LineTo(Trunc(x + startX), Trunc(y + startY + startLenY));
+    MoveTo(Trunc(x + startX), Trunc(y + startY));
+    LineTo(Trunc(x + startX + startLenX), Trunc(y + startY));
+    MoveTo(Trunc(x + startX), Trunc(y + FLenY - startY));
+    LineTo(Trunc(x + startX), Trunc(y + FLenY - startY - startLenY));
+    MoveTo(Trunc(x + startX), Trunc(y + FLenY - startY));
+    LineTo(Trunc(x + startX + startLenX), Trunc(y + FLenY - startY));
+    MoveTo(Trunc(x + FLenX - startX), Trunc(y + startY));
+    LineTo(Trunc(x + FLenX - startX - startLenX), Trunc(y + startY));
+    MoveTo(Trunc(x + FLenX - startX), Trunc(y + startY));
+    LineTo(Trunc(x + FLenX - startX), Trunc(y + startY + startLenY));
+    MoveTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY));
+    LineTo(Trunc(x + FLenX - startX - startLenX), Trunc(y + FLenY - startY));
+    MoveTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY));
+    LineTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY - startLenY));
   end;
 end;
 
@@ -614,27 +614,27 @@ var
   x, y: Double;
 begin
   if Self.IsTempGame then Exit;
-  with FPaintBox do
+  with FPaintBox.Canvas do
   begin
-    Canvas.Pen.Color := FGridColor;
-    Canvas.Pen.Width := 1;
-    Canvas.Brush.Color := FBackgroundColor;
+    Pen.Color := FGridColor;
+    Pen.Width := 1;
+    Brush.Color := FBackgroundColor;
     x := IToX(i);
     y := JToY(j);
     FLenX := FPaintBox.Width div FSizeX;
     FLenY := FPaintBox.Height div FSizeY;
-    Canvas.Rectangle(Trunc(x), Trunc(y), Trunc(x + FLenX), Trunc(y + FLenY));
+    Rectangle(Trunc(x), Trunc(y), Trunc(x + FLenX), Trunc(y + FLenY));
     if FBoard[i, j] <> PIECE_BLANK then
     begin
       if FBoard[i, j] = PIECE_WHITE then
-        Canvas.Brush.Color := FWhiteColor
+        Brush.Color := FWhiteColor
       else if FBoard[i, j] = PIECE_BLACK then
-        Canvas.Brush.Color := FBlackColor;
-      Canvas.Pen.Color := Canvas.Brush.Color;
-      Canvas.Pen.Width := 1;
+        Brush.Color := FBlackColor;
+      Pen.Color := Brush.Color;
+      Pen.Width := 1;
       x := IToX(i);
       y := JToY(j);
-      Canvas.Ellipse(Trunc(x + 5), Trunc(y + 5), Trunc(x + FLenX - 5), Trunc(y + FLenY - 5));
+      Ellipse(Trunc(x + 5), Trunc(y + 5), Trunc(x + FLenX - 5), Trunc(y + FLenY - 5));
       if (i = FLastMove.x) and (j = FLastMove.y) then
         DrawLastMove();
     end;
@@ -924,29 +924,29 @@ begin
     startY := 3;
     startLenX := 5;
     startLenY := 5;
-    with FPaintBox do
+    with FPaintBox.Canvas do
     begin
       if Turn = WHITE then
-        Canvas.Pen.Color := COLOR_AVAILABLEMOVE_WHITE
+        Pen.Color := COLOR_AVAILABLEMOVE_WHITE
       else
-        Canvas.Pen.Color := COLOR_AVAILABLEMOVE_BLACK;
-      Canvas.Pen.Width := 1;
-      Canvas.MoveTo(Trunc(x + startX), Trunc(y + startY));
-      Canvas.LineTo(Trunc(x + startX), Trunc(y + startY + startLenY));
-      Canvas.MoveTo(Trunc(x + startX), Trunc(y + startY));
-      Canvas.LineTo(Trunc(x + startX + startLenX), Trunc(y + startY));
-      Canvas.MoveTo(Trunc(x + startX), Trunc(y + FLenY - startY));
-      Canvas.LineTo(Trunc(x + startX), Trunc(y + FLenY - startY - startLenY));
-      Canvas.MoveTo(Trunc(x + startX), Trunc(y + FLenY - startY));
-      Canvas.LineTo(Trunc(x + startX + startLenX), Trunc(y + FLenY - startY));
-      Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + startY));
-      Canvas.LineTo(Trunc(x + FLenX - startX - startLenX), Trunc(y + startY));
-      Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + startY));
-      Canvas.LineTo(Trunc(x + FLenX - startX), Trunc(y + startY + startLenY));
-      Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY));
-      Canvas.LineTo(Trunc(x + FLenX - startX - startLenX), Trunc(y + FLenY - startY));
-      Canvas.MoveTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY));
-      Canvas.LineTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY - startLenY));
+        Pen.Color := COLOR_AVAILABLEMOVE_BLACK;
+      Pen.Width := 1;
+      MoveTo(Trunc(x + startX), Trunc(y + startY));
+      LineTo(Trunc(x + startX), Trunc(y + startY + startLenY));
+      MoveTo(Trunc(x + startX), Trunc(y + startY));
+      LineTo(Trunc(x + startX + startLenX), Trunc(y + startY));
+      MoveTo(Trunc(x + startX), Trunc(y + FLenY - startY));
+      LineTo(Trunc(x + startX), Trunc(y + FLenY - startY - startLenY));
+      MoveTo(Trunc(x + startX), Trunc(y + FLenY - startY));
+      LineTo(Trunc(x + startX + startLenX), Trunc(y + FLenY - startY));
+      MoveTo(Trunc(x + FLenX - startX), Trunc(y + startY));
+      LineTo(Trunc(x + FLenX - startX - startLenX), Trunc(y + startY));
+      MoveTo(Trunc(x + FLenX - startX), Trunc(y + startY));
+      LineTo(Trunc(x + FLenX - startX), Trunc(y + startY + startLenY));
+      MoveTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY));
+      LineTo(Trunc(x + FLenX - startX - startLenX), Trunc(y + FLenY - startY));
+      MoveTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY));
+      LineTo(Trunc(x + FLenX - startX), Trunc(y + FLenY - startY - startLenY));
     end;
   end;
 end;

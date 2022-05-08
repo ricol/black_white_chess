@@ -69,8 +69,6 @@ object FormMain: TFormMain
         Text = 'Status:'
         Width = 50
       end>
-    ExplicitTop = 391
-    ExplicitWidth = 391
   end
   object ProgressBar1: TProgressBar
     Left = 136
